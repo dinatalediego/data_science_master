@@ -158,13 +158,14 @@ The initial migration is in supabase/migrations/0001_socrates_foundation.sql.
 
 **Production:** https://socrates-ds.vercel.app
 
-The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. The live data foundation contains 7 courses, 24 starter concepts, 9 prerequisite edges and 14 tutor prompts.
+The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. It also includes a curated Ivy+ Learning Library that links official MIT, Harvard and Stanford sources without mirroring copyrighted course content. The live data foundation contains 7 courses, 24 starter concepts, 9 prerequisite edges and 14 tutor prompts.
 
 Implemented product surfaces:
 
 - Supabase email/password authentication
 - Campus Home with transparent next-best-action heuristic
 - seven course workspaces
+- Ivy+ Learning Library with official MIT, Harvard and Stanford resources mapped to your courses and concepts
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
