@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import AuthPanel from "@/components/AuthPanel";
 import TutorPanel from "@/components/TutorPanel";
+import LibraryPanel from "@/components/LibraryPanel";
 import { supabase } from "@/lib/supabase";
 import type {
   Concept,
@@ -14,7 +15,7 @@ import type {
   ReviewItem,
 } from "@/lib/types";
 
-type Tab = "campus" | "courses" | "socrates" | "mastery" | "calendar" | "thesis";
+type Tab = "campus" | "courses" | "library" | "socrates" | "mastery" | "calendar" | "thesis";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -270,6 +271,7 @@ export default function SocratesApp() {
             {[
               ["campus", "⌂", "Campus"],
               ["courses", "▦", "Cursos"],
+              ["library", "⌘", "Biblioteca"],
               ["socrates", "Σ", "Sócrates"],
               ["mastery", "◉", "Mastery"],
               ["calendar", "□", "Calendario"],
@@ -302,6 +304,8 @@ export default function SocratesApp() {
                 ? "Campus"
                 : tab === "courses"
                   ? "Mis cursos"
+                  : tab === "library"
+                  ? "Ivy+ Library"
                   : tab === "socrates"
                     ? "SÓCRATES"
                     : tab === "mastery"
@@ -492,6 +496,8 @@ export default function SocratesApp() {
             </div>
           </section>
         ) : null}
+
+        {tab === "library" ? <LibraryPanel courses={courses} /> : null}
 
         {tab === "socrates" ? (
           <TutorPanel userId={session.user.id} courses={courses} onEvidence={loadData} />
