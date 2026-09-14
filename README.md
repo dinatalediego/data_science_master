@@ -154,6 +154,27 @@ The Supabase foundation includes:
 
 The initial migration is in supabase/migrations/0001_socrates_foundation.sql.
 
+## Live product status
+
+**Production:** https://socrates-ds.vercel.app
+
+The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. The live data foundation contains 7 courses, 24 starter concepts, 9 prerequisite edges and 14 tutor prompts.
+
+Implemented product surfaces:
+
+- Supabase email/password authentication
+- Campus Home with transparent next-best-action heuristic
+- seven course workspaces
+- mastery evidence view
+- academic weekly calendar and explicit Monday conflict
+- thesis transfer workspace
+- SÓCRATES practice modes: Socratic, Feynman and Examiner
+- evidence writes: sessions, attempts, confidence, mastery summaries, misconceptions, review queue and append-first learning events
+- responsive desktop/mobile UI
+- GitHub Actions repository validation and production build
+
+Calendar integration is intentionally conservative: the connected Google Calendar was checked read-only during setup and no academic events matching the seven course names were found. The deployed application therefore uses its canonical academic schedule and does not write Google Calendar events automatically. Full in-app Google OAuth sync remains a separate integration step because it requires application OAuth credentials.
+
 ## V0.1 definition of done
 
 V0.1 is a **foundation release**, not yet the production web app.
@@ -165,12 +186,12 @@ V0.1 is a **foundation release**, not yet the production web app.
 - [x] Supabase schema versioned
 - [x] Seed data versioned
 - [x] Repository validation automated
-- [ ] Supabase project provisioned and migration applied
-- [ ] Next.js Campus shell implemented
-- [ ] Vercel deployment connected
-- [ ] Authentication enabled
-- [ ] Google Calendar synchronization implemented
-- [ ] SÓCRATES tutoring runtime implemented
+- [x] Supabase backend selected, namespaced migration applied and seed validated
+- [x] Next.js Campus shell implemented
+- [x] Vercel production deployment live
+- [x] Authentication enabled
+- [~] Google Calendar read-only setup check completed; runtime OAuth sync pending app credentials
+- [x] SÓCRATES evidence-driven tutoring baseline implemented
 
 ## Next milestone
 
