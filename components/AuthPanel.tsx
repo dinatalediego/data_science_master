@@ -19,6 +19,12 @@ function authMessage(error: unknown) {
   if (message.toLowerCase().includes("email rate limit")) {
     return "Se enviaron demasiados correos recientemente. Espera unos minutos e inténtalo otra vez.";
   }
+  if (
+    message.toLowerCase().includes("provider is not enabled") ||
+    message.toLowerCase().includes("unsupported provider")
+  ) {
+    return "Google Sign-In todavía no está habilitado en Supabase. Activa el provider Google y vuelve a intentarlo.";
+  }
   return message || "No se pudo autenticar.";
 }
 
@@ -31,6 +37,32 @@ export default function AuthPanel({ onAuthenticated }: Props) {
   const [busy, setBusy] = useState(false);
 
   const normalizedEmail = email.trim().toLowerCase();
+
+  async function signInWithGoogle() {
+    setBusy(true);
+    setStatus("");
+
+    try {
+      const redirectTo =
+        typeof window !== "undefined" ? window.location.origin : undefined;
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: "offline",
+            prompt: "select_account",
+          },
+        },
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      setStatus(authMessage(error));
+      setBusy(false);
+    }
+  }
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -161,6 +193,25 @@ export default function AuthPanel({ onAuthenticated }: Props) {
       </section>
 
       <section className="auth-card">
+        <div className="google-auth-block">
+          <div className="recommended-badge">RECOMENDADO</div>
+          <button
+            className="google-button"
+            type="button"
+            disabled={busy}
+            onClick={() => void signInWithGoogle()}
+          >
+            <span className="google-mark" aria-hidden="true">G</span>
+            Continuar con Google
+          </button>
+          <p>
+            Usa tu cuenta Google principal. Así evitas depender de correos de
+            recuperación para entrar al Campus.
+          </p>
+        </div>
+
+        <div className="auth-divider"><span>o usa email y contraseña</span></div>
+
         <div className="auth-tabs">
           <button
             className={mode === "signin" ? "active" : ""}
@@ -256,8 +307,9 @@ export default function AuthPanel({ onAuthenticated }: Props) {
         </form>
 
         <p className="microcopy">
-          Tus datos de aprendizaje se guardan en tablas SÓCRATES aisladas por RLS.
-          La clave pública del cliente no otorga acceso administrativo.
+          Google será la vía principal de acceso. Email/contraseña queda como método
+          de respaldo. Tus datos de aprendizaje se guardan en tablas SÓCRATES
+          aisladas por RLS.
         </p>
       </section>
     </main>
