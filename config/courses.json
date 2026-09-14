@@ -1,0 +1,138 @@
+{
+  "schema_version": "0.1",
+  "academic_term": {
+    "name": "Ciclo II",
+    "timezone": "America/Lima",
+    "nominal_start": "2026-09-14",
+    "nominal_end": "2027-01-16",
+    "week_count": 18,
+    "note": "Dates and week-level attendance should be verified against official academic notices before automation."
+  },
+  "courses": [
+    {
+      "slug": "forecasting-for-data-science",
+      "name": "Forecasting for Data Science",
+      "instructor": "Prof. Jaime Lincovil",
+      "credits": 2,
+      "academic_hours": 24,
+      "schedule": {
+        "day": "Monday",
+        "day_of_week": 1,
+        "start": "18:00",
+        "end": "21:00"
+      },
+      "learning_role": "Time, uncertainty, temporal validation, forecasting and decision-making.",
+      "color_token": "sky",
+      "source_status": "provided_timetable"
+    },
+    {
+      "slug": "ml-supervisado-advanced",
+      "name": "Machine Learning Supervisado Advanced",
+      "instructor": "Prof. Miguel Galarreta",
+      "credits": 2,
+      "academic_hours": 24,
+      "schedule": {
+        "day": "Monday",
+        "day_of_week": 1,
+        "start": "19:00",
+        "end": "22:00"
+      },
+      "learning_role": "Advanced supervised learning, tuning, calibration, interpretation and model comparison.",
+      "color_token": "blue",
+      "source_status": "provided_timetable"
+    },
+    {
+      "slug": "ciberseguridad-ia",
+      "name": "Electivo 2 — Ciberseguridad de IA",
+      "instructor": "Prof. Alan Morante",
+      "credits": 2,
+      "academic_hours": 24,
+      "schedule": {
+        "day": "Tuesday",
+        "day_of_week": 2,
+        "start": "19:00",
+        "end": "22:00"
+      },
+      "learning_role": "Security, privacy, adversarial risk, governance and responsible AI.",
+      "color_token": "green",
+      "source_status": "provided_timetable"
+    },
+    {
+      "slug": "matematica-ml-ia",
+      "name": "Matemática para ML e IA",
+      "instructor": null,
+      "credits": null,
+      "academic_hours": null,
+      "schedule": {
+        "day": "Wednesday",
+        "day_of_week": 3,
+        "start": "19:00",
+        "end": "22:00"
+      },
+      "learning_role": "Linear algebra, calculus, probability and optimization foundations for machine learning.",
+      "color_token": "rose",
+      "source_status": "provided_timetable_partial",
+      "note": "Instructor, credits and academic hours were not visible in the supplied source and are intentionally left unknown."
+    },
+    {
+      "slug": "ml-supervisado-fundamentals",
+      "name": "Machine Learning Supervisado Fundamentals",
+      "instructor": "Prof. Amao Suxo",
+      "credits": 3,
+      "academic_hours": 36,
+      "schedule": {
+        "day": "Thursday",
+        "day_of_week": 4,
+        "start": "19:00",
+        "end": "22:00"
+      },
+      "learning_role": "Core supervised learning, evaluation, generalization, features and reproducible modeling.",
+      "color_token": "amber",
+      "source_status": "provided_timetable"
+    },
+    {
+      "slug": "ml-no-supervisado",
+      "name": "Machine Learning No Supervisado",
+      "instructor": "Prof. Kevin Fernández",
+      "credits": 3,
+      "academic_hours": 36,
+      "schedule": {
+        "day": "Saturday",
+        "day_of_week": 6,
+        "start": "10:00",
+        "end": "13:00"
+      },
+      "learning_role": "Latent structure, clustering, representation and dimensionality reduction.",
+      "color_token": "violet",
+      "source_status": "provided_timetable"
+    },
+    {
+      "slug": "proyecto-integrador-tesis",
+      "name": "Proyecto Integrador — Desarrollo del Plan de Tesis",
+      "instructor": "Prof. Kevin Fernández",
+      "credits": 2,
+      "academic_hours": 24,
+      "schedule": {
+        "day": "Saturday",
+        "day_of_week": 6,
+        "start": "14:00",
+        "end": "17:00"
+      },
+      "learning_role": "Research design, integration, reproducibility, evidence and thesis production.",
+      "color_token": "purple",
+      "source_status": "provided_timetable"
+    }
+  ],
+  "known_conflicts": [
+    {
+      "type": "time_overlap",
+      "course_slugs": [
+        "forecasting-for-data-science",
+        "ml-supervisado-advanced"
+      ],
+      "day": "Monday",
+      "overlap": "19:00-21:00",
+      "handling": "Campus must surface this conflict and allow attendance/catch-up decisions rather than silently resolving it."
+    }
+  ]
+}
