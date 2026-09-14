@@ -1212,3 +1212,358 @@ textarea {
   font-weight: 700;
   font-size: 12px;
 }
+
+
+/* Ivy+ Learning Library */
+.library-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 220px;
+  gap: 24px;
+  align-items: center;
+  padding: clamp(28px, 5vw, 50px);
+  border-radius: 28px;
+  color: white;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(226, 169, 59, 0.25), transparent 28%),
+    linear-gradient(135deg, #081d3b, #173d70 72%, #1f4d87);
+  box-shadow: var(--shadow);
+}
+
+.library-hero h2 {
+  max-width: 880px;
+  margin: 0;
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+}
+
+.library-hero p:not(.eyebrow) {
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.65;
+}
+
+.library-count {
+  min-height: 160px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.library-count strong {
+  font-size: 54px;
+  line-height: 1;
+}
+
+.library-count span,
+.library-count small {
+  display: block;
+}
+
+.library-count span {
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.library-count small {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 9px;
+}
+
+.library-filters {
+  display: grid;
+  grid-template-columns: auto minmax(260px, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+}
+
+.library-filters label {
+  margin: 0;
+}
+
+.institution-tabs {
+  display: flex;
+  gap: 5px;
+  padding: 4px;
+  border-radius: 13px;
+  background: #eef2f7;
+}
+
+.institution-tabs button {
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 12px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+}
+
+.institution-tabs button.active {
+  background: white;
+  color: var(--ink);
+  box-shadow: 0 4px 12px rgba(16, 33, 63, 0.08);
+}
+
+.library-toggle {
+  grid-template-columns: 18px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 11px !important;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.library-toggle input {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+}
+
+.library-section-title {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 4px 2px 12px;
+}
+
+.library-section-title h3 {
+  margin: 0;
+  font-size: 23px;
+  letter-spacing: -0.025em;
+}
+
+.library-section-title > span {
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.featured-resources .resource-card {
+  border-top: 3px solid #173d70;
+}
+
+.resource-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 365px;
+}
+
+.resource-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.institution-badge,
+.resource-level,
+.access-badge {
+  border-radius: 999px;
+  padding: 6px 9px;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.institution-badge {
+  background: #eef2f7;
+  color: var(--ink);
+}
+
+.institution-badge.mit {
+  background: #fbecec;
+  color: #9a2525;
+}
+
+.institution-badge.stanford {
+  background: #faeded;
+  color: #8b2020;
+}
+
+.institution-badge.harvard {
+  background: #f9ecee;
+  color: #8b1d2c;
+}
+
+.resource-level {
+  background: #f2f5f8;
+  color: #738096;
+}
+
+.resource-code {
+  margin-top: 19px;
+  color: #758198;
+  font-size: 10px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.resource-card h3 {
+  margin: 8px 0 10px;
+  font-size: 20px;
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+}
+
+.resource-card > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.resource-role {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 13px;
+  background: #f7f9fc;
+}
+
+.resource-role strong,
+.resource-role span {
+  display: block;
+}
+
+.resource-role strong {
+  color: #536078;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.resource-role span {
+  margin-top: 5px;
+  color: #68758b;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.resource-course-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 13px;
+}
+
+.resource-course-links span {
+  max-width: 100%;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: #eef3fb;
+  color: #365988;
+  font-size: 8px;
+  line-height: 1.25;
+}
+
+.resource-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.access-badge.open_full {
+  background: #edf8f3;
+  color: #267452;
+}
+
+.access-badge.free,
+.access-badge.free_audit {
+  background: #eef4ff;
+  color: #315ea9;
+}
+
+.access-badge.benchmark_only {
+  background: #fff4e6;
+  color: #98621c;
+}
+
+.resource-footer a {
+  color: var(--blue);
+  text-decoration: none;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.library-policy {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.library-policy h3 {
+  margin: 0;
+  font-size: 25px;
+  letter-spacing: -0.03em;
+}
+
+.library-policy p:not(.eyebrow) {
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 12px;
+}
+
+.policy-list {
+  display: grid;
+}
+
+.policy-list span {
+  padding: 11px 0;
+  border-top: 1px solid #edf0f4;
+  color: #59667d;
+  font-size: 11px;
+}
+
+.policy-list span:first-child {
+  border-top: 0;
+}
+
+@media (max-width: 1100px) {
+  .resource-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .library-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .library-toggle {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 760px) {
+  .library-hero,
+  .library-policy {
+    grid-template-columns: 1fr;
+  }
+
+  .library-count {
+    min-height: 120px;
+  }
+
+  .library-filters,
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .institution-tabs {
+    overflow-x: auto;
+  }
+}
