@@ -360,7 +360,7 @@ textarea {
   margin: 0 auto 26px;
   display: flex;
   justify-content: space-between;
-  align-items: end;
+  align-items: flex-end;
   gap: 20px;
 }
 
@@ -406,7 +406,7 @@ textarea {
 .section-heading {
   display: flex;
   justify-content: space-between;
-  align-items: end;
+  align-items: flex-end;
   margin: 8px 0 4px;
 }
 
@@ -533,7 +533,7 @@ textarea {
 
 .card-heading {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
   margin-bottom: 17px;
@@ -685,7 +685,7 @@ textarea {
   display: grid;
   grid-template-columns: 1fr 1fr 1.2fr;
   gap: 16px;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .tutor-setup label {
@@ -1118,7 +1118,7 @@ textarea {
   }
 
   .topbar {
-    align-items: start;
+    align-items: flex-start;
   }
 
   .status-pill {
@@ -1146,7 +1146,7 @@ textarea {
   }
 
   .integration-note {
-    align-items: start;
+    align-items: flex-start;
     flex-direction: column;
   }
 }
@@ -1279,7 +1279,7 @@ textarea {
   display: grid;
   grid-template-columns: auto minmax(260px, 1fr) auto;
   gap: 18px;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .library-filters label {
@@ -1327,7 +1327,7 @@ textarea {
 
 .library-section-title {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 14px;
   margin: 4px 2px 12px;
@@ -1504,7 +1504,7 @@ textarea {
   display: grid;
   grid-template-columns: 1.4fr 1fr;
   gap: 26px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .library-policy h3 {
@@ -1759,7 +1759,7 @@ textarea {
   display: grid;
   grid-template-columns: 1fr minmax(280px, 420px);
   gap: 20px;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .reading-toolbar strong {
@@ -1784,13 +1784,13 @@ textarea {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .reading-unit-title {
   display: flex;
   gap: 13px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .reading-unit-kicker {
@@ -2170,7 +2170,7 @@ textarea {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .coach-heading h4 {
@@ -2215,7 +2215,7 @@ textarea {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
-  align-items: end;
+  align-items: flex-end;
 }
 
 .coach-form textarea {
