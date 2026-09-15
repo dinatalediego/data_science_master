@@ -14,6 +14,13 @@ REQUIRED_FILES = [
     'docs/LEARNING_CONSTITUTION.md',
     'docs/ROADMAP.md',
     'supabase/migrations/0001_socrates_foundation.sql',
+    'supabase/migrations/0003_reading_companion.sql',
+    'supabase/migrations/0004_adaptive_reading_ai.sql',
+    'supabase/reading_companion_seed.sql',
+    'supabase/adaptive_reading_seed.sql',
+    'components/ReadingRoomPanel.tsx',
+    'components/ReadingCoachPanel.tsx',
+    'app/api/reading-coach/route.ts',
     'supabase/seed.sql',
 ]
 
@@ -68,5 +75,20 @@ math_course = by_slug['matematica-ml-ia']
 if math_course['schedule'] != {'day': 'Wednesday', 'day_of_week': 3, 'start': '19:00', 'end': '22:00'}:
     fail('Matemática para ML e IA schedule must remain Wednesday 19:00–22:00')
 
+adaptive_seed = (ROOT / 'supabase/adaptive_reading_seed.sql').read_text(encoding='utf-8')
+for required_source in ['hamilton-time-series-analysis', 'strang-linear-algebra-learning-data', 'mit-14384-lecture1']:
+    if required_source not in adaptive_seed:
+        fail(f'missing source-grounded seed: {required_source}')
+
+api_route = (ROOT / 'app/api/reading-coach/route.ts').read_text(encoding='utf-8')
+for contract in [
+    'Use ONLY the evidence supplied in the prompt',
+    'groundingStatus',
+    'sds_search_reading_chunks',
+    'disallowPromptTraining',
+]:
+    if contract not in api_route:
+        fail(f'AI reading contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses and required foundation files.')
+print(f'Validated {len(courses)} canonical courses, Reading Room, retrieval contract and AI grounding safeguards.')
