@@ -10,6 +10,8 @@ import {
 } from "@/lib/academicTerm";
 import type {
   InterventionOutcome,
+  InterventionEffectivenessConcept,
+  InterventionEffectivenessProfile,
   WeeklyCourseEvidence,
   WeeklyHistoryPoint,
   WeeklyLearningSnapshot,
@@ -89,6 +91,8 @@ export default function WeeklyReviewPanel() {
   const [courses, setCourses] = useState<WeeklyCourseEvidence[]>([]);
   const [history, setHistory] = useState<WeeklyHistoryPoint[]>([]);
   const [outcomes, setOutcomes] = useState<InterventionOutcome[]>([]);
+  const [effectiveness, setEffectiveness] = useState<InterventionEffectivenessProfile[]>([]);
+  const [conceptMemory, setConceptMemory] = useState<InterventionEffectivenessConcept[]>([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
 
@@ -96,8 +100,14 @@ export default function WeeklyReviewPanel() {
     setLoading(true);
     setStatus("");
 
-    const [snapshotResult, coursesResult, historyResult, outcomesResult] =
-      await Promise.all([
+    const [
+      snapshotResult,
+      coursesResult,
+      historyResult,
+      outcomesResult,
+      effectivenessResult,
+      conceptMemoryResult,
+    ] = await Promise.all([
         supabase.rpc("sds_weekly_learning_snapshot", {
           p_week_start: weekStart,
         }),
@@ -110,13 +120,22 @@ export default function WeeklyReviewPanel() {
         supabase.rpc("sds_intervention_outcomes", {
           p_days: 90,
         }),
+        supabase.rpc("sds_intervention_effectiveness_profile", {
+          p_days: 180,
+        }),
+        supabase.rpc("sds_intervention_effectiveness_by_concept", {
+          p_days: 180,
+          p_min_pairs: 2,
+        }),
       ]);
 
     const firstError =
       snapshotResult.error ||
       coursesResult.error ||
       historyResult.error ||
-      outcomesResult.error;
+      outcomesResult.error ||
+      effectivenessResult.error ||
+      conceptMemoryResult.error;
 
     if (firstError) {
       setStatus(firstError.message);
@@ -128,6 +147,12 @@ export default function WeeklyReviewPanel() {
     setCourses((coursesResult.data || []) as WeeklyCourseEvidence[]);
     setHistory((historyResult.data || []) as WeeklyHistoryPoint[]);
     setOutcomes((outcomesResult.data || []) as InterventionOutcome[]);
+    setEffectiveness(
+      (effectivenessResult.data || []) as InterventionEffectivenessProfile[]
+    );
+    setConceptMemory(
+      (conceptMemoryResult.data || []) as InterventionEffectivenessConcept[]
+    );
     setLoading(false);
   }, [weekStart]);
 
@@ -192,6 +217,19 @@ export default function WeeklyReviewPanel() {
           .join("\n")
       : "- Sin pares pre/post suficientes.";
 
+    const memoryLines = effectiveness.length
+      ? effectiveness
+          .map(
+            (item) =>
+              `- ${item.action_type}: n=${item.paired_outcomes}, Δ observado ${deltaLabel(
+                item.avg_observed_delta === null
+                  ? null
+                  : Number(item.avg_observed_delta)
+              )}, estado=${item.evidence_state}. ${item.interpretation}`
+          )
+          .join("\n")
+      : "- Memoria insuficiente: SÓCRATES esperará más pares antes/después.";
+
     const markdown = [
       "# SÓCRATES DS — Weekly Learning Review",
       "",
@@ -225,6 +263,10 @@ export default function WeeklyReviewPanel() {
       "",
       "## Course coverage",
       courseLines || "- Sin cursos cargados.",
+      "",
+      "## Personal Learning Memory",
+      "_Descriptive · observational · no ranking changes._",
+      memoryLines,
       "",
       "## Intervention outcome ledger",
       "_Observational · not causal._",
@@ -523,6 +565,77 @@ export default function WeeklyReviewPanel() {
             );
           })}
         </div>
+      </article>
+
+
+      <article className="card effectiveness-memory">
+        <div className="card-heading">
+          <div>
+            <p className="eyebrow dark">PERSONAL LEARNING MEMORY · V1.4</p>
+            <h3>¿Qué intervenciones parecen ayudarte?</h3>
+            <p className="effectiveness-disclaimer">
+              Memoria descriptiva basada en pares antes/después. No cambia el ranking
+              de recomendaciones y no interpreta asociación como causalidad.
+            </p>
+          </div>
+          <span className="status-badge">Minimum gate · n≥5</span>
+        </div>
+
+        {effectiveness.length ? (
+          <div className="effectiveness-grid">
+            {effectiveness.map((item) => (
+              <div className="effectiveness-row" key={item.action_type}>
+                <div>
+                  <strong>{item.action_type.replaceAll("_", " ")}</strong>
+                  <span className={`memory-state ${item.evidence_state}`}>
+                    {item.evidence_state}
+                  </span>
+                </div>
+                <div>
+                  <span>Pares</span>
+                  <strong>{item.paired_outcomes}</strong>
+                </div>
+                <div>
+                  <span>Δ observado</span>
+                  <strong>{deltaLabel(
+                    item.avg_observed_delta === null
+                      ? null
+                      : Number(item.avg_observed_delta)
+                  )}</strong>
+                </div>
+                <div>
+                  <span>Positivo</span>
+                  <strong>{pct(Number(item.positive_rate || 0))}</strong>
+                </div>
+                <p>{item.interpretation}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            Aún no hay pares antes/después suficientes para aprender qué tipo de
+            intervención parece funcionarte mejor. Esto es correcto: SÓCRATES
+            esperará evidencia real antes de personalizar por historial.
+          </div>
+        )}
+
+        {conceptMemory.length ? (
+          <div className="concept-memory">
+            <strong>Señales emergentes por concepto</strong>
+            <div>
+              {conceptMemory.slice(0, 6).map((item) => (
+                <span key={`${item.concept_id}-${item.action_type}`}>
+                  {item.concept_title} · {item.action_type.replaceAll("_", " ")} ·
+                  {" "}{item.paired_outcomes} pares · {deltaLabel(
+                    item.avg_observed_delta === null
+                      ? null
+                      : Number(item.avg_observed_delta)
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+        ) : null}
       </article>
 
       <article className="card outcome-ledger">

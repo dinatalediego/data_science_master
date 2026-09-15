@@ -4169,3 +4169,146 @@ textarea {
     text-align: left;
   }
 }
+
+
+/* V1.4 — Intervention Effectiveness Memory */
+.effectiveness-memory {
+  background:
+    radial-gradient(circle at 92% 8%, rgba(183, 138, 69, 0.09), transparent 25%),
+    #fff;
+}
+
+.effectiveness-disclaimer {
+  max-width: 760px;
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.effectiveness-grid {
+  display: grid;
+}
+
+.effectiveness-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1.2fr) 70px 90px 80px minmax(220px, 1.8fr);
+  gap: 12px;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 1px solid #edf0f4;
+}
+
+.effectiveness-row:first-child {
+  border-top: 0;
+}
+
+.effectiveness-row > div:first-child {
+  min-width: 0;
+}
+
+.effectiveness-row > div:first-child strong {
+  display: block;
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.effectiveness-row > div:not(:first-child) span,
+.effectiveness-row > div:not(:first-child) strong {
+  display: block;
+}
+
+.effectiveness-row > div:not(:first-child) span {
+  color: var(--muted);
+  font-size: 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.effectiveness-row > div:not(:first-child) strong {
+  margin-top: 3px;
+  font-size: 13px;
+}
+
+.effectiveness-row > p {
+  margin: 0;
+  color: #68758a;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.memory-state {
+  width: fit-content;
+  display: inline-flex;
+  margin-top: 5px;
+  border-radius: 999px;
+  padding: 4px 6px;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.memory-state.insufficient {
+  background: #eef1f5;
+  color: #69758a;
+}
+
+.memory-state.emerging {
+  background: #fff3dd;
+  color: #876123;
+}
+
+.memory-state.observed {
+  background: #e9f6ef;
+  color: #2e7354;
+}
+
+.concept-memory {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #edf0f4;
+}
+
+.concept-memory > strong {
+  display: block;
+  color: #55647a;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.concept-memory > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.concept-memory span {
+  border-radius: 999px;
+  padding: 6px 8px;
+  background: #f4f6f8;
+  color: #667388;
+  font-size: 8px;
+}
+
+@media (max-width: 900px) {
+  .effectiveness-row {
+    grid-template-columns: 1fr 70px 80px 70px;
+  }
+
+  .effectiveness-row > p {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 620px) {
+  .effectiveness-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .effectiveness-row > p {
+    grid-column: 1 / -1;
+  }
+}

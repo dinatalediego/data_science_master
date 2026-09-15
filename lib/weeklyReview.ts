@@ -66,3 +66,28 @@ export type InterventionOutcome = {
   observed_delta: number | null;
   outcome_status: "paired" | "post_only" | "no_post_evidence";
 };
+
+
+export type InterventionEffectivenessProfile = {
+  action_type: string;
+  paired_outcomes: number;
+  avg_observed_delta: number | null;
+  positive_rate: number;
+  stable_rate: number;
+  negative_rate: number;
+  evaluator_pair_rate: number;
+  evidence_state: "insufficient" | "emerging" | "observed";
+  interpretation: string;
+  last_observed_at: string | null;
+};
+
+export type InterventionEffectivenessConcept = {
+  concept_id: string;
+  concept_title: string;
+  action_type: string;
+  paired_outcomes: number;
+  avg_observed_delta: number | null;
+  positive_rate: number;
+  evidence_state: "insufficient" | "emerging" | "observed";
+  last_observed_at: string | null;
+};
