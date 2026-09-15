@@ -4312,3 +4312,258 @@ textarea {
     grid-column: 1 / -1;
   }
 }
+
+
+/* V1.5 — Pre-Cycle Readiness Launchpad */
+.precycle-launchpad {
+  display: grid;
+  gap: 22px;
+  padding: clamp(20px, 3vw, 30px);
+  border-color: #dfd7c8;
+  background:
+    radial-gradient(circle at 88% 10%, rgba(183, 138, 69, 0.13), transparent 28%),
+    linear-gradient(145deg, #fffdf8, #ffffff);
+}
+
+.precycle-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  gap: 24px;
+  align-items: center;
+}
+
+.precycle-hero h3 {
+  margin: 0;
+  max-width: 860px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(27px, 3.4vw, 40px);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.precycle-hero p:not(.eyebrow) {
+  max-width: 800px;
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.precycle-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.precycle-summary > div {
+  min-height: 112px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border: 1px solid #e4ded3;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.78);
+}
+
+.precycle-summary strong,
+.precycle-summary span {
+  display: block;
+}
+
+.precycle-summary strong {
+  font-size: 27px;
+}
+
+.precycle-summary span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.precycle-priorities {
+  padding: 17px;
+  border-radius: 18px;
+  background: #0c2444;
+  color: white;
+}
+
+.precycle-priorities .card-heading {
+  margin-bottom: 5px;
+}
+
+.precycle-priorities .eyebrow,
+.precycle-priorities .card-heading > span {
+  color: rgba(255,255,255,0.55) !important;
+}
+
+.precycle-priorities h3 {
+  color: white;
+}
+
+.precycle-priority {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+  padding: 15px 0;
+  border-top: 1px solid rgba(255,255,255,0.09);
+}
+
+.precycle-rank {
+  color: #cfb07c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 17px;
+}
+
+.precycle-priority strong {
+  font-size: 11px;
+}
+
+.precycle-priority p {
+  margin: 4px 0 0;
+  color: rgba(255,255,255,0.67);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.precycle-priority small {
+  display: block;
+  margin-top: 5px;
+  color: rgba(255,255,255,0.45);
+  font-size: 8px;
+}
+
+.precycle-priority button {
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 10px;
+  padding: 9px 11px;
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.precycle-course-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.precycle-course {
+  padding: 14px;
+  border: 1px solid #e7e8eb;
+  border-radius: 15px;
+  background: white;
+}
+
+.precycle-course > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.precycle-course > strong {
+  display: block;
+  margin-top: 9px;
+  font-size: 10px;
+}
+
+.precycle-course p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.precycle-course small {
+  display: block;
+  margin-top: 8px;
+  color: #8791a1;
+  font-size: 8px;
+}
+
+.readiness-state,
+.precycle-conflict {
+  border-radius: 999px;
+  padding: 4px 6px;
+  font-size: 7px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.readiness-state.baseline_missing {
+  background: #fff1df;
+  color: #8a5f1d;
+}
+
+.readiness-state.early_evidence,
+.readiness-state.attempt_without_concept_evidence,
+.readiness-state.foundation_open {
+  background: #edf4ff;
+  color: #37649c;
+}
+
+.readiness-state.evidence_started {
+  background: #e9f6ef;
+  color: #2c7352;
+}
+
+.precycle-conflict {
+  background: #fceaea;
+  color: #944141;
+}
+
+.precycle-overlap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding-top: 17px;
+  border-top: 1px solid #ece8df;
+}
+
+.precycle-overlap > div {
+  max-width: 780px;
+}
+
+.precycle-overlap strong {
+  font-size: 11px;
+}
+
+.precycle-overlap p:not(.eyebrow) {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+@media (max-width: 820px) {
+  .precycle-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .precycle-summary {
+    max-width: 360px;
+  }
+
+  .precycle-course-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .precycle-priority {
+    grid-template-columns: 28px 1fr;
+  }
+
+  .precycle-priority button {
+    grid-column: 2;
+    width: fit-content;
+  }
+
+  .precycle-overlap {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
