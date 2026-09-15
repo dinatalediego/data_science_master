@@ -32,20 +32,7 @@ type LearningAction = {
   due_at: string | null;
 };
 
-type NextReadingAction = {
-  user_task_id: string;
-  reading_unit_id: string;
-  course_id: string;
-  course_name: string;
-  unit_title: string;
-  week_label: string;
-  task_title: string;
-  task_type: string;
-  instructions: string;
-  estimated_minutes: number;
-  source_locator: string | null;
-  trigger_reason: string;
-};
+
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -127,7 +114,6 @@ export default function SocratesApp() {
   const [mastery, setMastery] = useState<Mastery[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [misconceptions, setMisconceptions] = useState<Misconception[]>([]);
-  const [nextReading, setNextReading] = useState<NextReadingAction | null>(null);
   const [learningActions, setLearningActions] = useState<LearningAction[]>([]);
   const [error, setError] = useState("");
 
@@ -146,7 +132,6 @@ export default function SocratesApp() {
         masteryResult,
         reviewsResult,
         misconceptionsResult,
-        nextReadingResult,
         learningActionsResult,
       ] = await Promise.all([
         supabase
@@ -172,7 +157,6 @@ export default function SocratesApp() {
           .eq("user_id", session.user.id)
           .in("status", ["open", "improving", "reopened"])
           .order("severity", { ascending: false }),
-        supabase.rpc("sds_next_reading_action"),
         supabase.rpc("sds_next_best_learning_actions", { p_limit: 3 }),
       ]);
 
@@ -183,7 +167,6 @@ export default function SocratesApp() {
         masteryResult.error ||
         reviewsResult.error ||
         misconceptionsResult.error ||
-        nextReadingResult.error ||
         learningActionsResult.error;
 
       if (firstError) throw firstError;
@@ -194,8 +177,6 @@ export default function SocratesApp() {
       setMastery((masteryResult.data || []) as Mastery[]);
       setReviews((reviewsResult.data || []) as ReviewItem[]);
       setMisconceptions((misconceptionsResult.data || []) as Misconception[]);
-      const readingRows = (nextReadingResult.data || []) as NextReadingAction[];
-      setNextReading(readingRows[0] || null);
       setLearningActions((learningActionsResult.data || []) as LearningAction[]);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo cargar el Campus.");
