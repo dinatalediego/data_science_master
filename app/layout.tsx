@@ -3,7 +3,8 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "SÓCRATES DS",
-  description: "Personal Learning Campus for Data Science mastery.",
+  description:
+    "Personal Learning Campus with source-grounded AI Reading Coach, adaptive next-best learning actions and persistent Study Packs.",
 };
 
 export default function RootLayout({
