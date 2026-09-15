@@ -16,6 +16,7 @@ type Props = {
 
 const EMPTY: ReinforcementSnapshot = {
   attempts: 0,
+  evaluated_attempts: 0,
   calibrated_concepts: 0,
   overconfident_concepts: 0,
   underconfident_concepts: 0,
@@ -54,7 +55,7 @@ export default function ReinforcementPanel({
 
     const [snapshotResult, calibrationResult, actionsResult] = await Promise.all([
       supabase.rpc("sds_reinforcement_snapshot"),
-      supabase.rpc("sds_calibration_profile"),
+      supabase.rpc("sds_calibration_profile_v2"),
       supabase.rpc("sds_next_best_learning_actions", { p_limit: 8 }),
     ]);
 
@@ -98,7 +99,7 @@ export default function ReinforcementPanel({
         label: "SIN LÍNEA BASE",
         title: "Primero necesitamos intentos reales",
         body:
-          "Haz al menos dos intentos por concepto para comparar confianza y autoevaluación. Antes de eso, SÓCRATES no inventa una señal de calibración.",
+          "Haz al menos dos intentos por concepto para comparar confianza y evidencia. Cuando el evaluador independiente no está disponible, SÓCRATES lo declara y usa tu autoevaluación como fallback.",
       };
     }
 
@@ -107,7 +108,7 @@ export default function ReinforcementPanel({
         label: "CALIBRATION GAP",
         title: "Hay confianza que todavía necesita evidencia",
         body:
-          "SÓCRATES detectó conceptos donde la confianza promedio supera claramente la autoevaluación. La intervención correcta es una prueba cerrada, no más lectura pasiva.",
+          "SÓCRATES detectó conceptos donde la confianza promedio supera claramente la evidencia efectiva. La intervención correcta es una prueba cerrada, no más lectura pasiva.",
       };
     }
 
@@ -116,7 +117,7 @@ export default function ReinforcementPanel({
         label: "HIDDEN STRENGTH",
         title: "Podrías estar subestimando evidencia sólida",
         body:
-          "Hay conceptos donde tu autoevaluación supera a tu confianza. Conviene comprobarlos con transferencia antes de asignarles más estudio.",
+          "Hay conceptos donde la evidencia efectiva supera a tu confianza. Conviene comprobarlos con transferencia antes de asignarles más estudio.",
       };
     }
 
@@ -158,7 +159,10 @@ export default function ReinforcementPanel({
         <article className="card">
           <span>Intentos observados</span>
           <strong>{snapshot.attempts}</strong>
-          <small>Necesarios para calibrar confianza.</small>
+          <small>
+            {snapshot.evaluated_attempts} con contraste independiente ·{" "}
+            {Math.max(0, snapshot.attempts - snapshot.evaluated_attempts)} con fallback.
+          </small>
         </article>
         <article className="card">
           <span>Prerrequisitos en riesgo</span>
@@ -210,7 +214,7 @@ export default function ReinforcementPanel({
           <div className="card-heading">
             <div>
               <p className="eyebrow dark">CALIBRATION BY CONCEPT</p>
-              <h3>Confianza vs. autoevaluación</h3>
+              <h3>Confianza vs. evidencia efectiva</h3>
             </div>
           </div>
 
@@ -224,7 +228,9 @@ export default function ReinforcementPanel({
                   <div className="calibration-row" key={item.concept_id}>
                     <div>
                       <strong>{item.concept_title}</strong>
-                      <small>{item.attempts} intento(s)</small>
+                      <small>
+                        {item.attempts} intento(s) · {item.evaluated_attempts} evaluado(s)
+                      </small>
                     </div>
                     <div className="calibration-bars">
                       <span>
@@ -232,13 +238,15 @@ export default function ReinforcementPanel({
                         confianza {percent(Number(item.avg_confidence))}
                       </span>
                       <span>
-                        <i style={{ width: `${Number(item.avg_self_score) * 100}%` }} />
-                        autoeval. {percent(Number(item.avg_self_score))}
+                        <i style={{ width: `${Number(item.avg_performance) * 100}%` }} />
+                        evidencia {percent(Number(item.avg_performance))}
                       </span>
                     </div>
                     <div className={`calibration-gap ${item.calibration_state}`}>
                       {gapLabel(Number(item.calibration_gap))}
-                      <small>{item.calibration_state}</small>
+                      <small>
+                        {item.calibration_state} · {item.score_source}
+                      </small>
                     </div>
                   </div>
                 ))}
@@ -246,7 +254,8 @@ export default function ReinforcementPanel({
           ) : (
             <div className="empty-state">
               Todavía no hay intentos suficientes. Entra a SÓCRATES, responde antes de
-              mirar la guía y registra confianza + autoevaluación.
+              mirar la guía y registra confianza + respuesta. El contraste independiente
+              aparecerá cuando el evaluador pueda usar una guía explícita.
             </div>
           )}
         </article>
