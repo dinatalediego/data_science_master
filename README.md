@@ -1,6 +1,6 @@
 # SÓCRATES DS — Personal Learning Campus
 
-> **V1.0 — Adaptive Learning OS**
+> **V1.1 — Reinforcement Learning OS**
 >
 > A personal learning operating system for mastering a Data Science graduate program through evidence, retrieval, deliberate practice, transfer, and reflection — not passive content consumption.
 
@@ -175,6 +175,7 @@ Implemented product surfaces:
 - private PDF ingestion with page-aware provenance and owner-isolated storage
 - persistent AI Study Packs: carta, resumen, concept cards, mapa/infografía, práctica y checklist
 - transparent Next-Best Learning Action queue driven by retrieval due dates, misconceptions, unfinished readings and evidence-backed weaknesses
+- Reinforcement Engine with 24h snooze, repeated-deferral detection, 10-minute rescue missions, self-calibration diagnostics and prerequisite rescue
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
@@ -205,9 +206,9 @@ V0.1 is a **foundation release**, not yet the production web app.
 
 ## Next milestone
 
-**V1.1 — Outcome-calibrated adaptation**
+**V1.2 — Outcome-calibrated adaptation**
 
-Measure whether recommended actions actually improve later recall, transfer and calibration, then let challenger policies compete against the transparent V1.0 rules.
+Replace self-score as the only performance signal with explicit rubric/AI/human-scored evidence, measure whether interventions improve later recall and transfer, and let challenger policies compete against the transparent V1.1 rule baseline.
 
 ---
 
