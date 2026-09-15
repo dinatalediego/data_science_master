@@ -122,6 +122,21 @@ reading_ranked as (
   where ut.user_id = auth.uid()
     and (u.owner_user_id is null or u.owner_user_id = auth.uid())
 ),
+reading_candidates as (
+  select
+    rr.*,
+    row_number() over (
+      partition by rr.course_name
+      order by
+        case when rr.grounding_status = 'source_grounded' then 0 else 1 end,
+        rr.unit_sequence,
+        rr.sequence,
+        rr.task_title
+    ) as course_rank
+  from reading_ranked rr
+  where rr.status not in ('completed','skipped')
+    and (rr.sequence = 1 or rr.previous_status = 'completed')
+),
 reading_actions as (
   select
     (
@@ -152,9 +167,8 @@ reading_actions as (
     null::text as concept_title,
     estimated_minutes::integer,
     null::timestamptz as due_at
-  from reading_ranked
-  where status not in ('completed','skipped')
-    and (sequence = 1 or previous_status = 'completed')
+  from reading_candidates
+  where course_rank = 1
 ),
 mastery_scored as (
   select
