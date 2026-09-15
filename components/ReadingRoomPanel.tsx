@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import type { Course } from "@/lib/types";
 import ReadingCoachPanel from "@/components/ReadingCoachPanel";
 import ReadingUploadPanel from "@/components/ReadingUploadPanel";
+import StudyPackPanel from "@/components/StudyPackPanel";
 
 type ReadingSource = {
   id: string;
@@ -506,6 +507,8 @@ export default function ReadingRoomPanel({
                   <ArtifactView key={artifact.id} artifact={artifact} />
                 ) : null
               )}
+
+              <StudyPackPanel readingUnitId={unit.id} unitTitle={unit.title} />
 
               <ReadingCoachPanel readingUnitId={unit.id} unitTitle={unit.title} />
 
