@@ -18,6 +18,7 @@ REQUIRED_FILES = [
     'supabase/migrations/0004_adaptive_reading_ai.sql',
     'supabase/migrations/0005_private_reading_ingestion.sql',
     'supabase/migrations/0006_persistent_study_packs.sql',
+    'supabase/migrations/0007_next_best_action_engine.sql',
     'supabase/reading_companion_seed.sql',
     'supabase/adaptive_reading_seed.sql',
     'components/ReadingRoomPanel.tsx',
@@ -105,6 +106,16 @@ study_pack_route = (ROOT / 'app/api/study-pack/route.ts').read_text(encoding='ut
 for contract in ['sds_user_study_packs', 'source_locators', 'Use only the supplied evidence', 'disallowPromptTraining']:
     if contract not in study_pack_route:
         fail(f'Study Pack grounding contract missing: {contract}')
+
+nba_sql = (ROOT / 'supabase/migrations/0007_next_best_action_engine.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_next_best_learning_actions',
+    'overdue spaced retrieval',
+    'sds_learning_action_events',
+    'weak_mastery',
+]:
+    if contract.lower() not in nba_sql.lower():
+        fail(f'Next-Best Action contract missing: {contract}')
 
 print('SÓCRATES DS repository validation passed.')
 print(f'Validated {len(courses)} canonical courses, Reading Room, retrieval contract and AI grounding safeguards.')
