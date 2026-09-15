@@ -88,3 +88,20 @@ No adaptive challenger should replace the transparent reinforcement rules until:
 - evaluator coverage is adequate;
 - outcome definitions are stable;
 - a prospective experiment can compare policies fairly.
+
+
+## Exportable portfolio
+
+The learner can export the selected weekly review as a Markdown portfolio file.
+
+The export includes:
+- week boundaries and timezone;
+- evidence counts;
+- evaluator coverage;
+- calibration summary;
+- visible learning debt;
+- Stop / Start / Continue guidance;
+- all-seven-course coverage;
+- paired intervention outcome observations.
+
+The export preserves the same product contract as the UI: it explicitly labels intervention deltas as observational rather than causal and does not present SÓCRATES scores as official academic grades.
