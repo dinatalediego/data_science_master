@@ -20,57 +20,75 @@ Google Sign-In as preferred path; email/password retained as backup.
 ### V0.6 — Ivy+ Library + Reading Room
 MIT/Harvard/Stanford curation, first-weeks reading routes, persistent checklists and source-derived study artifacts.
 
-## V0.7 — AI Reading Companion — current release
+### V0.7 — AI Reading Companion
+Source-grounded Hamilton / Strang / MIT 14.384 routes, AI Reading Coach, evidence-required checklists and spaced retrieval.
 
-Goal: turn readings into adaptive evidence loops.
+### V0.8 — Private ingestion
+Private PDF upload, page-aware parsing/chunking, owner-isolated storage, reading-unit proposals and provenance.
 
-- [x] source-grounded Hamilton / Strang / MIT 14.384 pack
-- [x] reading-unit → concept mappings
-- [x] evidence-required checklist actions
-- [x] confidence captured separately
-- [x] first incomplete action becomes a Campus trigger
-- [x] T+1 / T+3 / T+7 / T+21 review scheduling
-- [x] source retrieval with locators
-- [x] AI modes: explain, Socratic, quiz, derive, apply, summary, cards, infographic spec, checklist
-- [x] AI interaction audit
-- [x] evidence-only fallback if live AI is unavailable
-- [x] CI safeguards for grounding contract
-- [ ] production deployment + smoke test
+### V0.9 — Persistent Study Packs
+Persistent AI-generated carta, summary, concept cards, infographic spec, practice and checklist with provenance.
 
-## V0.8 — Private ingestion
+### V1.0 — Learning OS
+Transparent Next-Best Learning Action queue, top-3 recommendations, audit events, academic-term runtime and the seven-course Campus.
 
-Goal: make new course material self-service while preserving provenance.
+## V1.1 — Reinforcement Engine — current release
 
-- private upload workflow for syllabi, books, papers and slides
-- page-aware parsing and chunking
-- source/version registry
-- reading-unit proposal from syllabus/week structure
-- automatic artifact drafts with human approval
-- source coverage and retrieval-quality tests
+Goal: detect where learning is breaking and recommend the smallest useful intervention.
 
-## V0.9 — Adaptive learning engine
+- [x] persisted action snooze/deferral state
+- [x] 24-hour snooze from recommendations
+- [x] repeated-deferral detection
+- [x] 10-minute rescue intervention
+- [x] confidence vs self-score calibration profile
+- [x] overconfidence / underconfidence diagnostics
+- [x] prerequisite rescue from concept-dependency graph
+- [x] learner-facing Reinforcement Lab
+- [x] targeted deep links from next-best action → Reading Room / SÓCRATES
+- [x] targeted action completion audit
+- [x] deterministic priority rules before ML
+- [x] RLS-isolated action state
+- [ ] production deployment + authenticated smoke test
 
-Goal: choose smaller, more effective interventions.
+## V1.2 — Outcome-calibrated adaptation
 
-- misconception diagnostics from answer evidence
-- prerequisite rescue missions
-- confidence × performance calibration
-- adaptive difficulty
-- repeated-deferral detection
-- 10–15 minute rescue missions
-- retrieval scheduling tuned from observed performance
+Goal: stop using self-score as the only performance signal.
 
-## V1.0 — Learning OS
+- rubric/AI-assisted grading with explicit uncertainty
+- human override / review path
+- compare confidence against externally scored performance
+- measure intervention uplift on later recall and transfer
+- challenger policy vs deterministic V1.1 baseline
+- promote challenger only with measurable improvement
+- preserve decision provenance and rollback
 
-Goal: one coherent operating system for the seven courses and thesis.
+## V1.3 — Weekly Learning Review
 
-- class → reading → retrieval → practice → transfer cycle
+Goal: turn the system into an observable learning PMO.
+
+- weekly evidence recap
+- retention trend
+- calibration trend
+- backlog / deferral trend
+- course coverage vs academic week
+- thesis transfer evidence
+- “stop doing / start doing / continue” recommendations
+- exportable learning portfolio
+
+## V2.0 — Personal Learning Intelligence
+
+Goal: a durable learner model that compounds across courses.
+
 - cross-course concept graph
-- thesis as transfer layer
-- measurable weekly learning review
-- auditable next-best learning action
-- reproducible learning portfolio
+- intervention effectiveness memory
+- personal forgetting curves
+- source preference / modality evidence
+- skill transfer graph
+- thesis and professional-project transfer
+- model-assisted recommendations constrained by transparent policy gates
 
 ## Product gate
 
-Do not optimize for more AI output. Optimize for better evidence of learning. Transparent rules remain the default; automation earns scope only after observed usefulness.
+Do not optimize for more AI output. Optimize for stronger later evidence.
+
+Transparent rules remain the default. Any adaptive or ML challenger must beat the deterministic baseline on retention, transfer or calibration before promotion.
