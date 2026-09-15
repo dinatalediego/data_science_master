@@ -2840,3 +2840,127 @@ textarea {
     flex-direction: column;
   }
 }
+
+
+/* V1.0 — Next-Best Learning Action queue */
+.hero-action-meta {
+  margin: 16px 0 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.hero-action-meta span {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.68);
+  font-size: 8px;
+  line-height: 1.35;
+}
+
+.nba-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 12px;
+}
+
+.nba-card {
+  position: relative;
+  min-height: 150px;
+  display: grid;
+  grid-template-columns: 32px 1fr 34px;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 16px;
+  border: 1px solid #e2e7ee;
+  border-radius: 17px;
+  background: white;
+  color: var(--ink);
+  text-align: left;
+  box-shadow: 0 10px 30px rgba(16,33,63,0.04);
+}
+
+.nba-card:hover {
+  transform: translateY(-1px);
+  border-color: #cbd6e5;
+  box-shadow: 0 14px 34px rgba(16,33,63,0.07);
+}
+
+.nba-card.primary {
+  border-color: #c9d7e9;
+  background:
+    radial-gradient(circle at 95% 10%, rgba(76,140,217,0.10), transparent 28%),
+    linear-gradient(145deg, #ffffff, #f8fbff);
+}
+
+.nba-rank {
+  width: 29px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #eef2f7;
+  color: #66748a;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.nba-card.primary .nba-rank {
+  background: #102d54;
+  color: white;
+}
+
+.nba-card small,
+.nba-card strong,
+.nba-card p,
+.nba-card b {
+  display: block;
+}
+
+.nba-card small {
+  color: #8290a4;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.nba-card strong {
+  margin-top: 5px;
+  font-size: 12px;
+}
+
+.nba-card p {
+  margin: 6px 0 0;
+  color: #6e7a8f;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.nba-card b {
+  margin-top: 10px;
+  color: #8a6b3c;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.nba-card > i {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #f2f5f8;
+  color: #657288;
+  font-style: normal;
+  font-size: 9px;
+  font-weight: 850;
+}
+
+@media (max-width: 950px) {
+  .nba-strip {
+    grid-template-columns: 1fr;
+  }
+}
