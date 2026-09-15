@@ -209,6 +209,7 @@ for contract in [
     'START DOING',
     'CONTINUE',
     'Observational',
+    'Exportar portfolio .md',
 ]:
     if contract.lower() not in weekly_ui.lower():
         fail(f'Weekly review UI contract missing: {contract}')
