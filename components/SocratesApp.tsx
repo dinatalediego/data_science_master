@@ -18,20 +18,21 @@ import type {
 
 type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "calendar" | "thesis";
 
-type NextReadingAction = {
-  user_task_id: string;
-  reading_unit_id: string;
-  course_id: string;
-  course_name: string;
-  unit_title: string;
-  week_label: string;
-  task_title: string;
-  task_type: string;
-  instructions: string;
+type LearningAction = {
+  priority_score: number;
+  action_type: "review" | "misconception" | "reading" | "weak_mastery" | "baseline";
+  title: string;
+  body: string;
+  reason: string;
+  target_tab: "reading" | "socrates";
+  entity_id: string | null;
+  course_name: string | null;
+  concept_title: string | null;
   estimated_minutes: number;
-  source_locator: string | null;
-  trigger_reason: string;
+  due_at: string | null;
 };
+
+
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -113,7 +114,7 @@ export default function SocratesApp() {
   const [mastery, setMastery] = useState<Mastery[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [misconceptions, setMisconceptions] = useState<Misconception[]>([]);
-  const [nextReading, setNextReading] = useState<NextReadingAction | null>(null);
+  const [learningActions, setLearningActions] = useState<LearningAction[]>([]);
   const [error, setError] = useState("");
 
   const loadData = useCallback(async () => {
@@ -131,7 +132,7 @@ export default function SocratesApp() {
         masteryResult,
         reviewsResult,
         misconceptionsResult,
-        nextReadingResult,
+        learningActionsResult,
       ] = await Promise.all([
         supabase
           .from("sds_courses")
@@ -156,7 +157,7 @@ export default function SocratesApp() {
           .eq("user_id", session.user.id)
           .in("status", ["open", "improving", "reopened"])
           .order("severity", { ascending: false }),
-        supabase.rpc("sds_next_reading_action"),
+        supabase.rpc("sds_next_best_learning_actions", { p_limit: 3 }),
       ]);
 
       const firstError =
@@ -166,7 +167,7 @@ export default function SocratesApp() {
         masteryResult.error ||
         reviewsResult.error ||
         misconceptionsResult.error ||
-        nextReadingResult.error;
+        learningActionsResult.error;
 
       if (firstError) throw firstError;
 
@@ -176,8 +177,7 @@ export default function SocratesApp() {
       setMastery((masteryResult.data || []) as Mastery[]);
       setReviews((reviewsResult.data || []) as ReviewItem[]);
       setMisconceptions((misconceptionsResult.data || []) as Misconception[]);
-      const readingRows = (nextReadingResult.data || []) as NextReadingAction[];
-      setNextReading(readingRows[0] || null);
+      setLearningActions((learningActionsResult.data || []) as LearningAction[]);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo cargar el Campus.");
     } finally {
@@ -228,46 +228,37 @@ export default function SocratesApp() {
   const next = nextCourse(courses);
 
   const recommendation = useMemo(() => {
-    if (dueReviews.length) {
-      const concept = conceptById.get(dueReviews[0].concept_id);
+    const top = learningActions[0];
+    if (top) {
       return {
-        kicker: "RETRIEVAL DUE",
-        title: concept ? `Recupera: ${concept.title}` : "Tienes una revisión vencida",
-        body: "Prioriza recuperación activa antes de consumir contenido nuevo. El objetivo es comprobar qué permanece sin mirar apuntes.",
-        action: "Ir a SÓCRATES",
+        kicker:
+          top.action_type === "review"
+            ? "RETRIEVAL DUE"
+            : top.action_type === "misconception"
+              ? "MISCONCEPTION"
+              : top.action_type === "reading"
+                ? "READING TRIGGER"
+                : top.action_type === "weak_mastery"
+                  ? "WEAKEST EVIDENCE"
+                  : "FIRST EVIDENCE",
+        title: top.title,
+        body: top.body,
+        action:
+          top.target_tab === "reading" ? "Abrir Reading Room" : "Ir a SÓCRATES",
+        reason: top.reason,
+        minutes: top.estimated_minutes,
       };
     }
 
-    if (nextReading) {
-      return {
-        kicker: "READING TRIGGER",
-        title: nextReading.task_title,
-        body: `${nextReading.instructions} · ${nextReading.course_name} · ${nextReading.estimated_minutes} min`,
-        action: "Abrir Reading Room",
-      };
-    }
-
-    if (!evidencedConcepts.length) {
-      return {
-        kicker: "FIRST EVIDENCE",
-        title: "Crea tu primera línea base",
-        body: "Todavía no hay evidencia suficiente para personalizar tu aprendizaje. Completa una sesión corta para empezar a calibrar dominio y confianza.",
-        action: "Empezar diagnóstico",
-      };
-    }
-
-    const weakest = evidencedConcepts
-      .map((item) => ({ item, avg: masteryAverage(item) ?? 1 }))
-      .sort((a, b) => a.avg - b.avg)[0];
-
-    const concept = conceptById.get(weakest.item.concept_id);
     return {
-      kicker: "WEAKEST EVIDENCE",
-      title: concept ? `Refuerza: ${concept.title}` : "Refuerza tu evidencia más débil",
-      body: "La recomendación se basa en la evidencia registrada, no en el porcentaje de contenido consumido.",
-      action: "Practicar ahora",
+      kicker: "QUEUE CLEAR",
+      title: "No hay una intervención prioritaria pendiente",
+      body: "Cuando aparezca evidencia nueva, SÓCRATES volverá a ordenar la cola.",
+      action: "Ir a SÓCRATES",
+      reason: "No hay candidatos activos en el motor de reglas.",
+      minutes: 0,
     };
-  }, [dueReviews, nextReading, evidencedConcepts, conceptById]);
+  }, [learningActions]);
 
   if (authLoading) {
     return (
@@ -282,11 +273,27 @@ export default function SocratesApp() {
     return <AuthPanel onAuthenticated={() => void supabase.auth.getSession().then(({ data }) => setSession(data.session))} />;
   }
 
-  function goRecommendedAction() {
-    if (!dueReviews.length && nextReading) {
-      setTab("reading");
+  async function goLearningAction(action?: LearningAction) {
+    const selected = action || learningActions[0];
+
+    if (selected) {
+      await supabase.rpc("sds_log_learning_action_event", {
+        p_action_type: selected.action_type,
+        p_entity_id: selected.entity_id,
+        p_event_type: "opened",
+        p_priority_score: selected.priority_score,
+        p_reason: selected.reason,
+        p_metadata: {
+          course_name: selected.course_name,
+          concept_title: selected.concept_title,
+          estimated_minutes: selected.estimated_minutes,
+        },
+      });
+
+      setTab(selected.target_tab);
       return;
     }
+
     setTab("socrates");
   }
 
@@ -372,7 +379,11 @@ export default function SocratesApp() {
                 <p className="eyebrow">NEXT-BEST LEARNING ACTION</p>
                 <h2>{recommendation.title}</h2>
                 <p>{recommendation.body}</p>
-                <button className="light-button" onClick={goRecommendedAction}>
+                <div className="hero-action-meta">
+                  <span>{recommendation.minutes ? `≈ ${recommendation.minutes} min` : "Ready"}</span>
+                  <span>{recommendation.reason}</span>
+                </div>
+                <button className="light-button" onClick={() => void goLearningAction()}>
                   {recommendation.action} →
                 </button>
               </div>
@@ -384,6 +395,31 @@ export default function SocratesApp() {
                 </div>
               </div>
             </div>
+
+            {learningActions.length ? (
+              <div className="nba-strip">
+                {learningActions.map((action, index) => (
+                  <button
+                    type="button"
+                    key={`${action.action_type}-${action.entity_id || index}`}
+                    className={`nba-card ${index === 0 ? "primary" : ""}`}
+                    onClick={() => void goLearningAction(action)}
+                  >
+                    <span className="nba-rank">0{index + 1}</span>
+                    <div>
+                      <small>{action.action_type.replace("_", " ")}</small>
+                      <strong>{action.title}</strong>
+                      <p>{action.reason}</p>
+                      <b>
+                        {action.course_name || action.concept_title || "SÓCRATES"}
+                        {" · "}{action.estimated_minutes} min
+                      </b>
+                    </div>
+                    <i>{Math.round(Number(action.priority_score))}</i>
+                  </button>
+                ))}
+              </div>
+            ) : null}
 
             <div className="metrics-grid">
               <Metric
