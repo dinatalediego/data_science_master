@@ -82,7 +82,7 @@ Goal: turn the system into an observable learning PMO and measure what happens a
 - [x] exportable Markdown learning portfolio
 - [x] observational / non-causal outcome labeling
 
-## V1.4 — Intervention Effectiveness Memory — current release
+## V1.4 — Intervention Effectiveness Memory
 
 Goal: let learner-specific evidence compound cautiously across weeks.
 
@@ -95,6 +95,22 @@ Goal: let learner-specific evidence compound cautiously across weeks.
 - [x] strict non-causal language
 - [x] policy firewall: memory does not change action ranking
 - [ ] prospective challenger experiment after sufficient paired outcomes
+- [ ] production deployment after Vercel rate-limit reset
+
+## V1.5 — Pre-Cycle Readiness Launchpad — current release
+
+Goal: use the runway before 28 Sep to establish evidence and reduce Week-1 friction without overloading the learner.
+
+- [x] seven-course readiness RPC
+- [x] explicit baseline-missing state
+- [x] concept evidence coverage
+- [x] diagnostic-question availability
+- [x] source-grounded reading availability
+- [x] bounded top-3 launch priorities
+- [x] Forecasting/Math source-grounded foundations surfaced first
+- [x] Monday overlap surfaced before Week 1
+- [x] Launchpad disappears automatically after the term starts
+- [x] no readiness score from passive consumption
 - [ ] production deployment after Vercel rate-limit reset
 
 ## V2.0 — Personal Learning Intelligence
