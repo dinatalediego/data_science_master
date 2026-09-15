@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createHash, randomUUID } from "crypto";
-import pdf from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 import { NextRequest } from "next/server";
 
 export const runtime = "nodejs";
@@ -10,12 +10,6 @@ const FALLBACK_SUPABASE_URL = "https://tlyczyfsboqrtrdpwizp.supabase.co";
 const FALLBACK_SUPABASE_KEY = "sb_publishable_gMTGwNPjdwgNuzzRPpUPyA_ezrPfCrT";
 const BUCKET = "sds-readings";
 const MAX_BYTES = 25 * 1024 * 1024;
-
-type PageRenderData = {
-  getTextContent: (options?: Record<string, unknown>) => Promise<{
-    items: Array<{ str?: string; transform?: number[] }>;
-  }>;
-};
 
 type ChunkInsert = {
   source_id: string;
@@ -203,33 +197,14 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await fileBlob.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     const sourceHash = createHash("sha256").update(buffer).digest("hex");
-    const pages: string[] = [];
+    const parser = new PDFParse({ data: buffer });
+    const parsed = await parser.getText();
+    await parser.destroy();
 
-    const parsed = await pdf(buffer, {
-      pagerender: async (pageData: PageRenderData) => {
-        const content = await pageData.getTextContent({
-          normalizeWhitespace: true,
-          disableCombineTextItems: false,
-        });
+    const pages = parsed.pages.map((page) => page.text.trim());
+    const pageCount = parsed.total;
 
-        let text = "";
-        let lastY: number | null = null;
-
-        for (const item of content.items) {
-          const str = item.str || "";
-          const y = Array.isArray(item.transform) ? item.transform[5] : null;
-          if (lastY !== null && y !== null && y !== lastY) text += "\n";
-          else if (text && !text.endsWith("\n")) text += " ";
-          text += str;
-          lastY = y;
-        }
-
-        pages.push(text.trim());
-        return text;
-      },
-    });
-
-    if (!parsed.numpages || pages.every((page) => !page.trim())) {
+    if (!pageCount || pages.every((page) => !page.trim())) {
       throw new Error(
         "No pude extraer texto del PDF. Si es un escaneo, necesitará OCR en una versión posterior."
       );
@@ -253,7 +228,7 @@ export async function POST(request: NextRequest) {
         storage_path: storagePath,
         mime_type: fileBlob.type || "application/pdf",
         file_size_bytes: fileBlob.size,
-        page_count: parsed.numpages,
+        page_count: pageCount,
         processing_status: "processing",
         processing_error: null,
         source_hash: sourceHash,
@@ -274,7 +249,7 @@ export async function POST(request: NextRequest) {
 
     const estimatedMinutes = Math.max(
       20,
-      Math.min(240, Math.ceil(parsed.numpages * 3.5))
+      Math.min(240, Math.ceil(pageCount * 3.5))
     );
 
     const { data: unit, error: unitError } = await supabase
@@ -288,7 +263,7 @@ export async function POST(request: NextRequest) {
         week_label: "Private Reading",
         sequence: 100 + (privateUnitCount || 0),
         title,
-        source_locator: `Private PDF · ${parsed.numpages} pages`,
+        source_locator: `Private PDF · ${pageCount} pages`,
         objective:
           "Comprender, explicar sin mirar y aplicar las ideas centrales de esta lectura privada.",
         why_it_matters:
@@ -444,7 +419,7 @@ export async function POST(request: NextRequest) {
           body:
             "No intentes cubrir todo el documento de una sola vez. Usa SÓCRATES AI para delimitar una pregunta, recuperar las páginas relevantes y después demostrar comprensión sin mirar la fuente.",
           source: originalFilename,
-          pages: parsed.numpages,
+          pages: pageCount,
           chunks: rows.length,
           next_step:
             "Empieza por el Preview inteligente y formula tres preguntas antes de pedir un resumen.",
@@ -467,7 +442,7 @@ export async function POST(request: NextRequest) {
         .update({
           source_id: sourceId,
           status: "ready",
-          page_count: parsed.numpages,
+          page_count: pageCount,
           chunk_count: rows.length,
           completed_at: new Date().toISOString(),
           error_message: null,
@@ -479,7 +454,7 @@ export async function POST(request: NextRequest) {
       sourceId,
       readingUnitId: unitId,
       title,
-      pageCount: parsed.numpages,
+      pageCount: pageCount,
       chunkCount: rows.length,
       status: "ready",
     });
