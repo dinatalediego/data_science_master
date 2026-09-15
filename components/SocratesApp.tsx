@@ -17,7 +17,7 @@ import {
   startOfAcademicTerm,
   endOfAcademicTerm,
 } from "@/lib/academicTerm";
-import type { LearningAction } from "@/lib/learningActions";
+import type { LearningAction, LearningActionType } from "@/lib/learningActions";
 import type {
   Concept,
   Course,
@@ -106,6 +106,8 @@ export default function SocratesApp() {
   const [focusReadingTaskId, setFocusReadingTaskId] = useState<string | null>(null);
   const [focusTutorConceptId, setFocusTutorConceptId] = useState<string | null>(null);
   const [focusTutorCourseId, setFocusTutorCourseId] = useState<string | null>(null);
+  const [focusTutorActionType, setFocusTutorActionType] = useState<LearningActionType | null>(null);
+  const [focusTutorActionEntityId, setFocusTutorActionEntityId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
@@ -299,17 +301,31 @@ export default function SocratesApp() {
         setFocusReadingTaskId(selected.entity_id);
       }
 
-      if (
-        selected.target_tab === "socrates" &&
-        selected.entity_id &&
-        ["calibration", "prerequisite_rescue", "weak_mastery"].includes(
-          selected.action_type
-        )
-      ) {
-        setFocusTutorConceptId(selected.entity_id);
-        const linkedCourse = courseConcepts.find(
-          (link) => link.concept_id === selected.entity_id
-        );
+      if (selected.target_tab === "socrates") {
+        let conceptId: string | null = null;
+
+        if (
+          selected.entity_id &&
+          ["calibration", "prerequisite_rescue", "weak_mastery"].includes(
+            selected.action_type
+          )
+        ) {
+          conceptId = selected.entity_id;
+        } else if (selected.action_type === "review" && selected.entity_id) {
+          conceptId =
+            reviews.find((item) => item.id === selected.entity_id)?.concept_id || null;
+        } else if (selected.action_type === "misconception" && selected.entity_id) {
+          conceptId =
+            misconceptions.find((item) => item.id === selected.entity_id)?.concept_id || null;
+        }
+
+        setFocusTutorConceptId(conceptId);
+        setFocusTutorActionType(selected.action_type);
+        setFocusTutorActionEntityId(selected.entity_id);
+
+        const linkedCourse = conceptId
+          ? courseConcepts.find((link) => link.concept_id === conceptId)
+          : null;
         setFocusTutorCourseId(linkedCourse?.course_id || null);
       }
 
@@ -664,6 +680,8 @@ export default function SocratesApp() {
             onEvidence={loadData}
             focusConceptId={focusTutorConceptId}
             focusCourseId={focusTutorCourseId}
+            focusActionType={focusTutorActionType}
+            focusActionEntityId={focusTutorActionEntityId}
           />
         ) : null}
 
