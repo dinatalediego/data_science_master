@@ -1,6 +1,6 @@
 # SÓCRATES DS — Personal Learning Campus
 
-> **V0.7 — AI Reading Companion**
+> **V0.9 — Persistent AI Study Packs**
 >
 > A personal learning operating system for mastering a Data Science graduate program through evidence, retrieval, deliberate practice, transfer, and reflection — not passive content consumption.
 
@@ -169,6 +169,8 @@ Implemented product surfaces:
 - Reading Room with source-grounded first-weeks routes, persistent evidence checklists and next-action triggers
 - AI Reading Coach with explanation, Socratic, quiz, derivation, transfer and artifact-generation modes
 - automatic T+1/T+3/T+7/T+21 retrieval scheduling after completed reading missions
+- private PDF ingestion with page-aware provenance and owner-isolated storage
+- persistent AI Study Packs: carta, resumen, concept cards, mapa/infografía, práctica y checklist
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
@@ -199,9 +201,9 @@ V0.1 is a **foundation release**, not yet the production web app.
 
 ## Next milestone
 
-**V0.8 — Private ingestion**
+**V1.0 — Adaptive Learning OS**
 
-Let new syllabi, papers, slides and user-provided books enter the same source-grounded pipeline automatically: page-aware parsing, provenance, bounded retrieval, artifact drafts and human approval.
+Use observed evidence, confidence, misconceptions, incomplete tasks and spaced-retrieval performance to choose the smallest next-best learning intervention across the seven courses and thesis.
 
 ---
 
