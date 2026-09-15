@@ -1,6 +1,6 @@
 # SÓCRATES DS — Personal Learning Campus
 
-> **V0.9 — Persistent AI Study Packs**
+> **V1.0 — Adaptive Learning OS**
 >
 > A personal learning operating system for mastering a Data Science graduate program through evidence, retrieval, deliberate practice, transfer, and reflection — not passive content consumption.
 
@@ -171,6 +171,7 @@ Implemented product surfaces:
 - automatic T+1/T+3/T+7/T+21 retrieval scheduling after completed reading missions
 - private PDF ingestion with page-aware provenance and owner-isolated storage
 - persistent AI Study Packs: carta, resumen, concept cards, mapa/infografía, práctica y checklist
+- transparent Next-Best Learning Action queue driven by retrieval due dates, misconceptions, unfinished readings and evidence-backed weaknesses
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
@@ -201,9 +202,9 @@ V0.1 is a **foundation release**, not yet the production web app.
 
 ## Next milestone
 
-**V1.0 — Adaptive Learning OS**
+**V1.1 — Outcome-calibrated adaptation**
 
-Use observed evidence, confidence, misconceptions, incomplete tasks and spaced-retrieval performance to choose the smallest next-best learning intervention across the seven courses and thesis.
+Measure whether recommended actions actually improve later recall, transfer and calibration, then let challenger policies compete against the transparent V1.0 rules.
 
 ---
 
