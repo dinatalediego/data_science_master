@@ -221,7 +221,7 @@ for contract in [
     'sds_intervention_effectiveness_profile',
     'sds_intervention_effectiveness_by_concept',
     'paired_outcomes >= 5',
-    'does not',
+    'never alter policy ranking',
     'caus',
 ]:
     if contract.lower() not in memory_sql.lower():
