@@ -3,7 +3,10 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Course, Question, SessionMode } from "@/lib/types";
-import type { LearningActionType } from "@/lib/learningActions";
+import type {
+  LearningActionType,
+  TutorEvaluationResponse,
+} from "@/lib/learningActions";
 
 type Props = {
   userId: string;
@@ -59,6 +62,9 @@ export default function TutorPanel({
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
   const [focusConceptTitle, setFocusConceptTitle] = useState("");
+  const [evaluation, setEvaluation] = useState<TutorEvaluationResponse | null>(null);
+  const [evaluationBusy, setEvaluationBusy] = useState(false);
+  const [evaluationStatus, setEvaluationStatus] = useState("");
 
   const current = questions[questionIndex] || null;
   const selectedCourse = useMemo(
@@ -96,6 +102,9 @@ export default function TutorPanel({
     setStatus("");
     setSubmitted(false);
     setResponse("");
+    setEvaluation(null);
+    setEvaluationStatus("");
+    setEvaluationBusy(false);
 
     let query = supabase
       .from("sds_question_bank")
@@ -152,6 +161,63 @@ export default function TutorPanel({
     setResponse("");
     setSubmitted(false);
     setStatus("");
+    setEvaluation(null);
+    setEvaluationStatus("");
+    setEvaluationBusy(false);
+  }
+
+  async function evaluateAttempt(attemptId: string) {
+    setEvaluationBusy(true);
+    setEvaluationStatus("");
+
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+
+      if (!token) {
+        setEvaluationStatus(
+          "La evaluación independiente no pudo iniciarse porque la sesión expiró. Tu intento sí quedó guardado."
+        );
+        return;
+      }
+
+      const response = await fetch("/api/tutor-evaluate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ attemptId }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        setEvaluationStatus(
+          "Tu intento quedó guardado, pero el contraste independiente no estuvo disponible. La autoevaluación sigue como señal provisional."
+        );
+        return;
+      }
+
+      const nextEvaluation = payload as TutorEvaluationResponse;
+      setEvaluation(nextEvaluation);
+
+      if (nextEvaluation.effectiveScoreSource === "evaluator") {
+        setEvaluationStatus(
+          "Contraste independiente guardado. La calibración puede usar este score porque la confianza del evaluador superó el umbral."
+        );
+      } else {
+        setEvaluationStatus(
+          "Contraste guardado con confianza insuficiente o no disponible. SÓCRATES conserva tu autoevaluación como fallback explícito."
+        );
+      }
+    } catch {
+      setEvaluationStatus(
+        "Tu intento quedó guardado. El evaluador no respondió en esta ejecución, así que no se fabricó un score independiente."
+      );
+    } finally {
+      setEvaluationBusy(false);
+    }
   }
 
   async function submit(event: FormEvent) {
@@ -186,16 +252,21 @@ export default function TutorPanel({
       const normalizedScore = selfScore / 100;
       const normalizedConfidence = confidence / 100;
 
-      const { error: attemptError } = await supabase.from("sds_attempts").insert({
-        user_id: userId,
-        session_id: session.id,
-        question_id: current.id,
-        concept_id: current.concept_id,
-        response_text: response.trim(),
-        self_score: normalizedScore,
-        confidence: normalizedConfidence,
-        feedback: "Self-assessed attempt. Compare with the answer guide before the next review.",
-      });
+      const { data: attempt, error: attemptError } = await supabase
+        .from("sds_attempts")
+        .insert({
+          user_id: userId,
+          session_id: session.id,
+          question_id: current.id,
+          concept_id: current.concept_id,
+          response_text: response.trim(),
+          self_score: normalizedScore,
+          confidence: normalizedConfidence,
+          feedback:
+            "Learner self-score recorded separately. Independent evaluation may follow when a guide is available.",
+        })
+        .select("id")
+        .single();
 
       if (attemptError) throw attemptError;
 
@@ -316,7 +387,12 @@ export default function TutorPanel({
       }
 
       setSubmitted(true);
-      setStatus("Evidencia guardada. Ahora compara tu razonamiento con la guía.");
+      setStatus(
+        "Evidencia guardada. La guía queda visible y SÓCRATES intentará un contraste independiente no oficial."
+      );
+      setBusy(false);
+      await onEvidence();
+      await evaluateAttempt(attempt.id);
       await onEvidence();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "No se pudo guardar la evidencia.");
@@ -332,9 +408,9 @@ export default function TutorPanel({
           <p className="eyebrow dark">ADAPTIVE PRACTICE</p>
           <h2>SÓCRATES</h2>
           <p>
-            La primera versión deliberadamente no finge saber si tu respuesta es
-            correcta. Produce evidencia, separa confianza de desempeño y deja una
-            revisión programada.
+            Responde primero. SÓCRATES conserva tu confianza y autoevaluación por separado,
+            luego intenta contrastar tu respuesta contra la guía explícita. El contraste IA
+            es formativo y nunca se presenta como nota oficial.
           </p>
         </div>
       </div>
@@ -436,14 +512,97 @@ export default function TutorPanel({
             ) : null}
 
             {submitted ? (
-              <div className="answer-guide">
-                <p className="eyebrow dark">GUÍA DE CONTRASTE</p>
-                <p>{current.answer_guide || "No hay guía disponible para esta pregunta."}</p>
-                <p className="microcopy">
-                  Esta guía no convierte tu autoevaluación en una nota oficial. Úsala
-                  para identificar qué faltó en tu explicación.
-                </p>
-              </div>
+              <>
+                <div className="answer-guide">
+                  <p className="eyebrow dark">GUÍA DE CONTRASTE</p>
+                  <p>{current.answer_guide || "No hay guía disponible para esta pregunta."}</p>
+                  <p className="microcopy">
+                    La guía es el criterio explícito de contraste. Tu autoevaluación se
+                    conserva y no se sobrescribe.
+                  </p>
+                </div>
+
+                <div className="evaluator-panel">
+                  <div className="evaluator-heading">
+                    <div>
+                      <p className="eyebrow dark">AI EVIDENCE CONTRAST · NO OFFICIAL GRADE</p>
+                      <h4>Contraste independiente</h4>
+                    </div>
+                    {evaluation?.evaluation.score !== null &&
+                    evaluation?.evaluation.score !== undefined ? (
+                      <span className={`evaluator-verdict ${evaluation.evaluation.verdict || "insufficient"}`}>
+                        {Math.round(Number(evaluation.evaluation.score) * 100)}%
+                      </span>
+                    ) : null}
+                  </div>
+
+                  {evaluationBusy ? (
+                    <div className="evaluator-loading">
+                      Contrastando tu respuesta contra la guía explícita…
+                    </div>
+                  ) : null}
+
+                  {evaluation ? (
+                    <>
+                      <div className="evaluator-meta">
+                        <span>
+                          verdict · {evaluation.evaluation.verdict || "insufficient"}
+                        </span>
+                        <span>
+                          confianza evaluador ·{" "}
+                          {Math.round(
+                            Number(evaluation.evaluation.evaluator_confidence || 0) * 100
+                          )}
+                          %
+                        </span>
+                        <span>
+                          calibration source · {evaluation.effectiveScoreSource}
+                        </span>
+                      </div>
+
+                      {evaluation.evaluation.strengths?.length ? (
+                        <div className="evaluator-list strengths">
+                          <strong>Lo que sí quedó demostrado</strong>
+                          <ul>
+                            {evaluation.evaluation.strengths.map((item, index) => (
+                              <li key={`strength-${index}`}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+
+                      {evaluation.evaluation.gaps?.length ? (
+                        <div className="evaluator-list gaps">
+                          <strong>Lo que falta o debe precisarse</strong>
+                          <ul>
+                            {evaluation.evaluation.gaps.map((item, index) => (
+                              <li key={`gap-${index}`}>{item}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ) : null}
+
+                      {evaluation.evaluation.feedback ? (
+                        <div className="evaluator-feedback">
+                          <strong>Feedback</strong>
+                          <p>{evaluation.evaluation.feedback}</p>
+                        </div>
+                      ) : null}
+
+                      {evaluation.evaluation.next_prompt ? (
+                        <div className="evaluator-next">
+                          <strong>Siguiente pregunta sugerida</strong>
+                          <p>{evaluation.evaluation.next_prompt}</p>
+                        </div>
+                      ) : null}
+                    </>
+                  ) : null}
+
+                  {evaluationStatus ? (
+                    <p className="microcopy evaluator-status">{evaluationStatus}</p>
+                  ) : null}
+                </div>
+              </>
             ) : null}
 
             <div className="button-row">
