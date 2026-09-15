@@ -8,6 +8,7 @@ import LibraryPanel from "@/components/LibraryPanel";
 import ReadingRoomPanel from "@/components/ReadingRoomPanel";
 import ReinforcementPanel from "@/components/ReinforcementPanel";
 import WeeklyReviewPanel from "@/components/WeeklyReviewPanel";
+import PreCycleLaunchpad from "@/components/PreCycleLaunchpad";
 import { supabase } from "@/lib/supabase";
 import {
   ACADEMIC_TERM,
@@ -337,6 +338,23 @@ export default function SocratesApp() {
     setTab("socrates");
   }
 
+  function openPrecycleDiagnostic(courseId: string) {
+    setFocusTutorCourseId(courseId);
+    setFocusTutorConceptId(null);
+    setFocusTutorActionType(null);
+    setFocusTutorActionEntityId(null);
+    setTab("socrates");
+  }
+
+  function openPrecycleReading() {
+    setFocusReadingTaskId(null);
+    setTab("reading");
+  }
+
+  function openPrecycleCalendar() {
+    setTab("calendar");
+  }
+
   async function snoozeLearningAction(action: LearningAction) {
     setNotice("");
     const { data, error: snoozeError } = await supabase.rpc(
@@ -469,6 +487,15 @@ export default function SocratesApp() {
                 </div>
               </div>
             </div>
+
+            {termStatus.phase === "before" ? (
+              <PreCycleLaunchpad
+                daysUntilStart={termStatus.days}
+                onOpenDiagnostic={openPrecycleDiagnostic}
+                onOpenReading={openPrecycleReading}
+                onOpenCalendar={openPrecycleCalendar}
+              />
+            ) : null}
 
             {learningActions.length ? (
               <div className="nba-strip">
