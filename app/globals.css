@@ -4567,3 +4567,112 @@ textarea {
     flex-direction: column;
   }
 }
+
+
+/* V1.6 — Academic Week Intelligence */
+button.academic-week {
+  appearance: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.academic-week:hover {
+  border-color: #cdb27f;
+}
+
+.academic-week.selected {
+  border-color: #8a652b;
+  background: #fff4df;
+  box-shadow: 0 0 0 2px rgba(183, 138, 69, 0.12);
+}
+
+.academic-week.selected strong {
+  color: #6e4f20;
+}
+
+.academic-week:focus-visible {
+  outline: 2px solid #315f98;
+  outline-offset: 2px;
+}
+
+.academic-week-agenda {
+  padding: 17px;
+  border-radius: 17px;
+  background: #f8fafc;
+  border: 1px solid #e5e9ef;
+}
+
+.academic-week-agenda-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.academic-week-agenda-heading h4 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 20px;
+}
+
+.academic-week-agenda-heading > span {
+  border-radius: 999px;
+  padding: 6px 8px;
+  background: white;
+  border: 1px solid #e0e5ec;
+  color: #6d798c;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.academic-session-list {
+  display: grid;
+  margin-top: 12px;
+}
+
+.academic-session-row {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 0;
+  border-top: 1px solid #e8ecf1;
+}
+
+.academic-session-row:first-child {
+  border-top: 0;
+}
+
+.academic-session-row strong,
+.academic-session-row small {
+  display: block;
+}
+
+.academic-session-row strong {
+  font-size: 10px;
+}
+
+.academic-session-row small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  text-transform: capitalize;
+}
+
+.academic-session-conflict {
+  border-radius: 999px;
+  padding: 5px 7px;
+  background: #fceaea;
+  color: #914444;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+@media (max-width: 620px) {
+  .academic-week-agenda-heading {
+    flex-direction: column;
+  }
+}
