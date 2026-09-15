@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createHash, randomUUID } from "crypto";
 import pdf from "pdf-parse";
 import { NextRequest } from "next/server";
@@ -93,7 +93,7 @@ function keywordsFrom(text: string) {
 }
 
 async function insertInBatches(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   rows: ChunkInsert[]
 ) {
   for (let index = 0; index < rows.length; index += 100) {
