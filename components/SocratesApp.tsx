@@ -6,6 +6,7 @@ import AuthPanel from "@/components/AuthPanel";
 import TutorPanel from "@/components/TutorPanel";
 import LibraryPanel from "@/components/LibraryPanel";
 import ReadingRoomPanel from "@/components/ReadingRoomPanel";
+import ReinforcementPanel from "@/components/ReinforcementPanel";
 import { supabase } from "@/lib/supabase";
 import {
   ACADEMIC_TERM,
@@ -16,6 +17,7 @@ import {
   startOfAcademicTerm,
   endOfAcademicTerm,
 } from "@/lib/academicTerm";
+import type { LearningAction } from "@/lib/learningActions";
 import type {
   Concept,
   Course,
@@ -25,23 +27,7 @@ import type {
   ReviewItem,
 } from "@/lib/types";
 
-type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "calendar" | "thesis";
-
-type LearningAction = {
-  priority_score: number;
-  action_type: "review" | "misconception" | "reading" | "weak_mastery" | "baseline";
-  title: string;
-  body: string;
-  reason: string;
-  target_tab: "reading" | "socrates";
-  entity_id: string | null;
-  course_name: string | null;
-  concept_title: string | null;
-  estimated_minutes: number;
-  due_at: string | null;
-};
-
-
+type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "calendar" | "thesis";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -117,6 +103,10 @@ export default function SocratesApp() {
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [misconceptions, setMisconceptions] = useState<Misconception[]>([]);
   const [learningActions, setLearningActions] = useState<LearningAction[]>([]);
+  const [focusReadingTaskId, setFocusReadingTaskId] = useState<string | null>(null);
+  const [focusTutorConceptId, setFocusTutorConceptId] = useState<string | null>(null);
+  const [focusTutorCourseId, setFocusTutorCourseId] = useState<string | null>(null);
+  const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
 
   const loadData = useCallback(async () => {
@@ -242,9 +232,15 @@ export default function SocratesApp() {
               ? "MISCONCEPTION"
               : top.action_type === "reading"
                 ? "READING TRIGGER"
-                : top.action_type === "weak_mastery"
-                  ? "WEAKEST EVIDENCE"
-                  : "FIRST EVIDENCE",
+                : top.action_type === "deferral_rescue"
+                  ? "10-MIN RESCUE"
+                  : top.action_type === "calibration"
+                    ? "CALIBRATION"
+                    : top.action_type === "prerequisite_rescue"
+                      ? "PREREQUISITE RESCUE"
+                      : top.action_type === "weak_mastery"
+                        ? "WEAKEST EVIDENCE"
+                        : "FIRST EVIDENCE",
         title: top.title,
         body: top.body,
         action:
@@ -281,6 +277,8 @@ export default function SocratesApp() {
     const selected = action || learningActions[0];
 
     if (selected) {
+      setNotice("");
+
       await supabase.rpc("sds_log_learning_action_event", {
         p_action_type: selected.action_type,
         p_entity_id: selected.entity_id,
@@ -294,11 +292,59 @@ export default function SocratesApp() {
         },
       });
 
+      if (
+        selected.target_tab === "reading" &&
+        selected.entity_id
+      ) {
+        setFocusReadingTaskId(selected.entity_id);
+      }
+
+      if (
+        selected.target_tab === "socrates" &&
+        selected.entity_id &&
+        ["calibration", "prerequisite_rescue", "weak_mastery"].includes(
+          selected.action_type
+        )
+      ) {
+        setFocusTutorConceptId(selected.entity_id);
+        const linkedCourse = courseConcepts.find(
+          (link) => link.concept_id === selected.entity_id
+        );
+        setFocusTutorCourseId(linkedCourse?.course_id || null);
+      }
+
       setTab(selected.target_tab);
       return;
     }
 
     setTab("socrates");
+  }
+
+  async function snoozeLearningAction(action: LearningAction) {
+    setNotice("");
+    const { data, error: snoozeError } = await supabase.rpc(
+      "sds_snooze_learning_action",
+      {
+        p_action_type: action.action_type,
+        p_entity_id: action.entity_id,
+        p_hours: 24,
+        p_priority_score: action.priority_score,
+        p_reason: action.reason,
+      }
+    );
+
+    if (snoozeError) {
+      setError(snoozeError.message);
+      return;
+    }
+
+    const until = data ? new Date(data as string) : null;
+    setNotice(
+      until
+        ? `Acción pospuesta hasta ${until.toLocaleString("es-PE")}. Si la postergas repetidamente, SÓCRATES reducirá el alcance a un rescate de 10 minutos.`
+        : "Acción pospuesta 24 horas."
+    );
+    await loadData();
   }
 
   return (
@@ -321,6 +367,7 @@ export default function SocratesApp() {
               ["reading", "☰", "Reading Room"],
               ["socrates", "Σ", "Sócrates"],
               ["mastery", "◉", "Mastery"],
+              ["reinforcement", "↻", "Reinforcement"],
               ["calendar", "□", "Calendario"],
               ["thesis", "◇", "Tesis"],
             ].map(([value, icon, label]) => (
@@ -359,8 +406,10 @@ export default function SocratesApp() {
                     ? "SÓCRATES"
                     : tab === "mastery"
                       ? "Mastery"
-                      : tab === "calendar"
-                        ? "Calendario académico"
+                      : tab === "reinforcement"
+                        ? "Reinforcement Lab"
+                        : tab === "calendar"
+                          ? "Calendario académico"
                         : "Thesis Lab"}
             </h1>
           </div>
@@ -371,6 +420,7 @@ export default function SocratesApp() {
         </header>
 
         {error ? <div className="error-banner">{error}</div> : null}
+        {notice ? <div className="notice-banner">{notice}</div> : null}
 
         {dataLoading && !courses.length ? (
           <div className="loading-card card">Cargando evidencia del Campus…</div>
@@ -403,24 +453,36 @@ export default function SocratesApp() {
             {learningActions.length ? (
               <div className="nba-strip">
                 {learningActions.map((action, index) => (
-                  <button
-                    type="button"
+                  <article
                     key={`${action.action_type}-${action.entity_id || index}`}
                     className={`nba-card ${index === 0 ? "primary" : ""}`}
-                    onClick={() => void goLearningAction(action)}
                   >
                     <span className="nba-rank">0{index + 1}</span>
                     <div>
-                      <small>{action.action_type.replace("_", " ")}</small>
+                      <small>{action.action_type.replaceAll("_", " ")}</small>
                       <strong>{action.title}</strong>
                       <p>{action.reason}</p>
                       <b>
                         {action.course_name || action.concept_title || "SÓCRATES"}
                         {" · "}{action.estimated_minutes} min
                       </b>
+                      <div className="nba-card-actions">
+                        <button
+                          type="button"
+                          onClick={() => void goLearningAction(action)}
+                        >
+                          Empezar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => void snoozeLearningAction(action)}
+                        >
+                          +24h
+                        </button>
+                      </div>
                     </div>
                     <i>{Math.round(Number(action.priority_score))}</i>
-                  </button>
+                  </article>
                 ))}
               </div>
             ) : null}
@@ -587,11 +649,22 @@ export default function SocratesApp() {
         {tab === "library" ? <LibraryPanel courses={courses} /> : null}
 
         {tab === "reading" ? (
-          <ReadingRoomPanel userId={session.user.id} courses={courses} />
+          <ReadingRoomPanel
+            userId={session.user.id}
+            courses={courses}
+            focusTaskId={focusReadingTaskId}
+            onFocusConsumed={() => setFocusReadingTaskId(null)}
+          />
         ) : null}
 
         {tab === "socrates" ? (
-          <TutorPanel userId={session.user.id} courses={courses} onEvidence={loadData} />
+          <TutorPanel
+            userId={session.user.id}
+            courses={courses}
+            onEvidence={loadData}
+            focusConceptId={focusTutorConceptId}
+            focusCourseId={focusTutorCourseId}
+          />
         ) : null}
 
         {tab === "mastery" ? (
@@ -628,6 +701,13 @@ export default function SocratesApp() {
               })}
             </article>
           </section>
+        ) : null}
+
+        {tab === "reinforcement" ? (
+          <ReinforcementPanel
+            onOpenAction={goLearningAction}
+            onSnoozeAction={snoozeLearningAction}
+          />
         ) : null}
 
         {tab === "calendar" ? (
