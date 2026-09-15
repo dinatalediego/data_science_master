@@ -3674,3 +3674,475 @@ textarea {
 .evaluator-status {
   margin-top: 12px !important;
 }
+
+
+/* V1.3 — Weekly Learning Review */
+.weekly-review-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 205px;
+  gap: 26px;
+  align-items: center;
+  padding: clamp(30px, 5vw, 52px);
+  border-radius: 28px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 86% 18%, rgba(183, 138, 69, 0.24), transparent 28%),
+    radial-gradient(circle at 20% 90%, rgba(57, 117, 184, 0.13), transparent 30%),
+    linear-gradient(135deg, #07172d, #153555 66%, #29435f);
+  box-shadow: var(--shadow);
+}
+
+.weekly-review-hero h2 {
+  max-width: 900px;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4.8vw, 55px);
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.weekly-review-hero p:not(.eyebrow) {
+  max-width: 780px;
+  color: rgba(255,255,255,0.70);
+  line-height: 1.65;
+}
+
+.weekly-review-score {
+  min-height: 176px;
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.055);
+}
+
+.weekly-review-score span,
+.weekly-review-score strong,
+.weekly-review-score small {
+  display: block;
+}
+
+.weekly-review-score span {
+  color: rgba(255,255,255,0.58);
+  font-size: 8px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.weekly-review-score strong {
+  margin: 4px 0;
+  font-size: 48px;
+  line-height: 1;
+}
+
+.weekly-review-score small {
+  max-width: 140px;
+  color: rgba(255,255,255,0.55);
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.week-selector {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+}
+
+.week-selector > div {
+  text-align: center;
+}
+
+.week-selector h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+}
+
+.week-selector span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.weekly-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.weekly-metrics .card {
+  min-height: 130px;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+}
+
+.weekly-metrics span {
+  color: #718098;
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.weekly-metrics strong {
+  font-size: 30px;
+}
+
+.weekly-metrics small {
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.weekly-decision-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.weekly-decision {
+  min-height: 145px;
+  position: relative;
+  overflow: hidden;
+}
+
+.weekly-decision::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+}
+
+.weekly-decision.stop::before {
+  background: #a65548;
+}
+
+.weekly-decision.start::before {
+  background: #b78a45;
+}
+
+.weekly-decision.continue::before {
+  background: #3d7b5a;
+}
+
+.weekly-decision > span {
+  color: #6f7c91;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.weekly-decision p {
+  margin: 12px 0 0;
+  color: #3f4d63;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.weekly-evidence-grid {
+  align-items: stretch;
+}
+
+.weekly-calibration {
+  display: grid;
+  gap: 14px;
+}
+
+.weekly-calibration > div:not(.weekly-gap) {
+  display: grid;
+  grid-template-columns: 90px 54px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.weekly-calibration span {
+  color: #68768b;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.weekly-calibration strong {
+  font-size: 14px;
+}
+
+.weekly-calibration i {
+  position: relative;
+  overflow: hidden;
+  height: 9px;
+  border-radius: 999px;
+  background: #edf1f5;
+}
+
+.weekly-calibration i b {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: #35689f;
+}
+
+.weekly-gap {
+  padding: 13px;
+  border-radius: 13px;
+  background: #f7f8fa;
+}
+
+.weekly-gap span,
+.weekly-gap strong,
+.weekly-gap small {
+  display: block;
+}
+
+.weekly-gap strong {
+  margin-top: 2px;
+  font-size: 24px;
+}
+
+.weekly-gap small {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.5;
+}
+
+.weekly-backlog {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.weekly-backlog > div {
+  min-height: 94px;
+  display: grid;
+  align-content: center;
+  padding: 12px;
+  border-radius: 14px;
+  background: #f7f9fb;
+  border: 1px solid #edf0f4;
+}
+
+.weekly-backlog strong {
+  font-size: 24px;
+}
+
+.weekly-backlog span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.weekly-course-card .card-heading > span {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.weekly-course-list {
+  display: grid;
+}
+
+.weekly-course-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(160px, 1.2fr) 52px;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #edf0f4;
+}
+
+.weekly-course-row:first-child {
+  border-top: 0;
+}
+
+.weekly-course-row > div:first-child strong,
+.weekly-course-row > div:first-child small {
+  display: block;
+}
+
+.weekly-course-row > div:first-child strong {
+  font-size: 10px;
+}
+
+.weekly-course-row > div:first-child small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.weekly-course-bar {
+  position: relative;
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: #edf1f5;
+}
+
+.weekly-course-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: #315e91;
+}
+
+.weekly-course-row > span {
+  text-align: right;
+  color: #7a8799;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.weekly-history {
+  min-height: 190px;
+  display: grid;
+  grid-template-columns: repeat(8, minmax(44px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.weekly-history-column {
+  display: grid;
+  grid-template-rows: 120px auto auto;
+  gap: 5px;
+  text-align: center;
+}
+
+.weekly-history-bar {
+  height: 120px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 6px;
+  border-bottom: 1px solid #dfe5ec;
+}
+
+.weekly-history-bar i {
+  width: 100%;
+  max-width: 36px;
+  border-radius: 8px 8px 2px 2px;
+  background: linear-gradient(180deg, #315f93, #193c68);
+  min-height: 2px;
+}
+
+.weekly-history-column > strong {
+  font-size: 10px;
+}
+
+.weekly-history-column > span {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.outcome-ledger .card-heading {
+  align-items: flex-start;
+}
+
+.outcome-list {
+  display: grid;
+}
+
+.outcome-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.4fr) 90px 90px 76px;
+  gap: 12px;
+  align-items: center;
+  padding: 13px 0;
+  border-top: 1px solid #edf0f4;
+}
+
+.outcome-row:first-child {
+  border-top: 0;
+}
+
+.outcome-row > div:first-child strong,
+.outcome-row > div:first-child small,
+.outcome-row > div:nth-child(2) span,
+.outcome-row > div:nth-child(2) strong,
+.outcome-row > div:nth-child(2) small,
+.outcome-row > div:nth-child(3) span,
+.outcome-row > div:nth-child(3) strong,
+.outcome-row > div:nth-child(3) small {
+  display: block;
+}
+
+.outcome-row > div:first-child strong {
+  font-size: 10px;
+}
+
+.outcome-row small,
+.outcome-row span {
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.outcome-row > div:nth-child(2) strong,
+.outcome-row > div:nth-child(3) strong {
+  font-size: 13px;
+}
+
+.outcome-delta {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.outcome-delta.positive {
+  color: #2f7755;
+}
+
+.outcome-delta.negative {
+  color: #a05445;
+}
+
+.outcome-delta.neutral {
+  color: #748196;
+}
+
+@media (max-width: 980px) {
+  .weekly-review-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .weekly-review-score {
+    width: 160px;
+  }
+
+  .weekly-metrics,
+  .weekly-decision-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .week-selector,
+  .weekly-metrics,
+  .weekly-decision-grid,
+  .weekly-course-row,
+  .outcome-row {
+    grid-template-columns: 1fr;
+  }
+
+  .week-selector > div {
+    order: -1;
+    text-align: left;
+  }
+
+  .weekly-backlog {
+    grid-template-columns: 1fr;
+  }
+
+  .weekly-history {
+    overflow-x: auto;
+    grid-template-columns: repeat(8, 58px);
+  }
+
+  .outcome-delta,
+  .weekly-course-row > span {
+    text-align: left;
+  }
+}
