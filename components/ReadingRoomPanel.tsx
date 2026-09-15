@@ -297,6 +297,27 @@ export default function ReadingRoomPanel({
       return;
     }
 
+    if (completed) {
+      const { error: actionLogError } = await supabase.rpc(
+        "sds_log_learning_action_event",
+        {
+          p_action_type: "reading",
+          p_entity_id: task.id,
+          p_event_type: "completed",
+          p_priority_score: null,
+          p_reason: "Reading checklist evidence completed.",
+          p_metadata: {
+            confidence:
+              confidenceValue === null ? null : confidenceValue / 100,
+          },
+        }
+      );
+
+      if (actionLogError) {
+        setStatus(actionLogError.message);
+      }
+    }
+
     setTasks((current) =>
       current.map((item) =>
         item.id === task.id
