@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import AuthPanel from "@/components/AuthPanel";
 import TutorPanel from "@/components/TutorPanel";
 import LibraryPanel from "@/components/LibraryPanel";
+import ReadingRoomPanel from "@/components/ReadingRoomPanel";
 import { supabase } from "@/lib/supabase";
 import type {
   Concept,
@@ -15,7 +16,7 @@ import type {
   ReviewItem,
 } from "@/lib/types";
 
-type Tab = "campus" | "courses" | "library" | "socrates" | "mastery" | "calendar" | "thesis";
+type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "calendar" | "thesis";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -272,6 +273,7 @@ export default function SocratesApp() {
               ["campus", "⌂", "Campus"],
               ["courses", "▦", "Cursos"],
               ["library", "⌘", "Biblioteca"],
+              ["reading", "☰", "Reading Room"],
               ["socrates", "Σ", "Sócrates"],
               ["mastery", "◉", "Mastery"],
               ["calendar", "□", "Calendario"],
@@ -306,7 +308,9 @@ export default function SocratesApp() {
                   ? "Mis cursos"
                   : tab === "library"
                   ? "Ivy+ Library"
-                  : tab === "socrates"
+                  : tab === "reading"
+                    ? "Reading Room"
+                    : tab === "socrates"
                     ? "SÓCRATES"
                     : tab === "mastery"
                       ? "Mastery"
@@ -498,6 +502,10 @@ export default function SocratesApp() {
         ) : null}
 
         {tab === "library" ? <LibraryPanel courses={courses} /> : null}
+
+        {tab === "reading" ? (
+          <ReadingRoomPanel userId={session.user.id} courses={courses} />
+        ) : null}
 
         {tab === "socrates" ? (
           <TutorPanel userId={session.user.id} courses={courses} onEvidence={loadData} />
