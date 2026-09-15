@@ -178,6 +178,7 @@ as $$
       t.evidence_expected,
       t.estimated_minutes,
       u.source_locator,
+      u.grounding_status,
       t.sequence,
       u.sequence as unit_sequence,
       c.day_of_week,
@@ -217,6 +218,7 @@ as $$
   where status not in ('completed','skipped')
     and (sequence = 1 or previous_status = 'completed')
   order by
+    case when grounding_status = 'source_grounded' then 0 else 1 end,
     unit_sequence,
     day_of_week,
     sequence
