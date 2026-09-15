@@ -3,8 +3,8 @@
   "academic_term": {
     "name": "Ciclo II",
     "timezone": "America/Lima",
-    "nominal_start": "2026-09-14",
-    "nominal_end": "2027-01-16",
+    "nominal_start": "2026-09-28",
+    "nominal_end": "2027-01-30",
     "week_count": 18,
     "note": "Dates and week-level attendance should be verified against official academic notices before automation."
   },
