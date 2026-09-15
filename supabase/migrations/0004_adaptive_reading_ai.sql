@@ -21,15 +21,6 @@ create table if not exists public.sds_source_chunks (
   locator text not null,
   content_note text not null,
   keywords text[] not null default '{}',
-  search_document tsvector generated always as (
-    to_tsvector(
-      'simple',
-      coalesce(heading,'') || ' ' ||
-      coalesce(locator,'') || ' ' ||
-      coalesce(content_note,'') || ' ' ||
-      array_to_string(keywords, ' ')
-    )
-  ) stored,
   created_at timestamptz not null default now(),
   unique(source_id, locator, sequence)
 );
@@ -64,8 +55,6 @@ create index if not exists sds_idx_source_chunks_unit
 create index if not exists sds_idx_source_chunks_source
   on public.sds_source_chunks(source_id, sequence);
 
-create index if not exists sds_idx_source_chunks_search
-  on public.sds_source_chunks using gin(search_document);
 
 create index if not exists sds_idx_ai_interactions_user_recent
   on public.sds_ai_interactions(user_id, created_at desc);
@@ -124,7 +113,16 @@ as $$
       c.content_note,
       case
         when nullif(trim(p_query), '') is null then 0::real
-        else ts_rank_cd(c.search_document, websearch_to_tsquery('simple', p_query))
+        else ts_rank_cd(
+          to_tsvector(
+            'simple',
+            coalesce(c.heading,'') || ' ' ||
+            coalesce(c.locator,'') || ' ' ||
+            coalesce(c.content_note,'') || ' ' ||
+            array_to_string(c.keywords, ' ')
+          ),
+          websearch_to_tsquery('simple', p_query)
+        )
       end as rank,
       c.sequence
     from public.sds_source_chunks c
