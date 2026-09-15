@@ -3,11 +3,16 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Course, Question, SessionMode } from "@/lib/types";
+import type { LearningActionType } from "@/lib/learningActions";
 
 type Props = {
   userId: string;
   courses: Course[];
   onEvidence: () => Promise<void>;
+  focusConceptId?: string | null;
+  focusCourseId?: string | null;
+  focusActionType?: LearningActionType | null;
+  focusActionEntityId?: string | null;
 };
 
 const MODES: { value: SessionMode; label: string; contract: string }[] = [
@@ -34,7 +39,15 @@ function stageFor(mode: SessionMode) {
   return "recalled";
 }
 
-export default function TutorPanel({ userId, courses, onEvidence }: Props) {
+export default function TutorPanel({
+  userId,
+  courses,
+  onEvidence,
+  focusConceptId = null,
+  focusCourseId = null,
+  focusActionType = null,
+  focusActionEntityId = null,
+}: Props) {
   const [courseId, setCourseId] = useState(courses[0]?.id || "");
   const [mode, setMode] = useState<SessionMode>("socratic");
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -45,6 +58,7 @@ export default function TutorPanel({ userId, courses, onEvidence }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [status, setStatus] = useState("");
+  const [focusConceptTitle, setFocusConceptTitle] = useState("");
 
   const current = questions[questionIndex] || null;
   const selectedCourse = useMemo(
@@ -53,10 +67,30 @@ export default function TutorPanel({ userId, courses, onEvidence }: Props) {
   );
 
   useEffect(() => {
+    if (focusCourseId && focusCourseId !== courseId) {
+      setCourseId(focusCourseId);
+    }
+  }, [focusCourseId, courseId]);
+
+  useEffect(() => {
+    if (!focusConceptId) {
+      setFocusConceptTitle("");
+      return;
+    }
+
+    void supabase
+      .from("sds_concepts")
+      .select("title")
+      .eq("id", focusConceptId)
+      .maybeSingle()
+      .then(({ data }) => setFocusConceptTitle(data?.title || "Concepto objetivo"));
+  }, [focusConceptId]);
+
+  useEffect(() => {
     if (!courseId) return;
     void loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, mode]);
+  }, [courseId, mode, focusConceptId]);
 
   async function loadQuestions() {
     setStatus("");
@@ -71,7 +105,24 @@ export default function TutorPanel({ userId, courses, onEvidence }: Props) {
       .eq("mode", mode)
       .order("difficulty");
 
+    if (focusConceptId) {
+      query = query.eq("concept_id", focusConceptId);
+    }
+
     let { data, error } = await query;
+
+    if (!error && (!data || data.length === 0) && focusConceptId) {
+      const conceptFallback = await supabase
+        .from("sds_question_bank")
+        .select("id, course_id, concept_id, mode, dimension, prompt, answer_guide, difficulty")
+        .eq("course_id", courseId)
+        .eq("concept_id", focusConceptId)
+        .eq("active", true)
+        .order("difficulty");
+
+      data = conceptFallback.data;
+      error = conceptFallback.error;
+    }
 
     if (!error && (!data || data.length === 0)) {
       const fallback = await supabase
@@ -230,6 +281,40 @@ export default function TutorPanel({ userId, courses, onEvidence }: Props) {
 
       if (eventError) throw eventError;
 
+      if (focusActionType) {
+        const { error: actionError } = await supabase.rpc(
+          "sds_log_learning_action_event",
+          {
+            p_action_type: focusActionType,
+            p_entity_id: focusActionEntityId,
+            p_event_type: "completed",
+            p_priority_score: null,
+            p_reason: "Learner produced new tutor evidence for the targeted intervention.",
+            p_metadata: {
+              concept_id: current.concept_id,
+              question_id: current.id,
+              self_score: normalizedScore,
+              confidence: normalizedConfidence,
+            },
+          }
+        );
+
+        if (actionError) throw actionError;
+
+        if (focusActionType === "review" && focusActionEntityId) {
+          const { error: reviewCompletionError } = await supabase
+            .from("sds_review_items")
+            .update({
+              status: "completed",
+              completed_at: new Date().toISOString(),
+            })
+            .eq("id", focusActionEntityId)
+            .eq("user_id", userId);
+
+          if (reviewCompletionError) throw reviewCompletionError;
+        }
+      }
+
       setSubmitted(true);
       setStatus("Evidencia guardada. Ahora compara tu razonamiento con la guía.");
       await onEvidence();
@@ -253,6 +338,20 @@ export default function TutorPanel({ userId, courses, onEvidence }: Props) {
           </p>
         </div>
       </div>
+
+      {focusConceptId ? (
+        <article className="targeted-intervention card">
+          <div>
+            <p className="eyebrow dark">TARGETED INTERVENTION</p>
+            <h3>{focusConceptTitle || "Concepto objetivo"}</h3>
+            <p>
+              SÓCRATES llegó aquí desde una recomendación priorizada. Busca evidencia
+              específica para este concepto antes de devolverte a contenido nuevo.
+            </p>
+          </div>
+          <span>{focusActionType?.replaceAll("_", " ") || "focused practice"}</span>
+        </article>
+      ) : null}
 
       <div className="tutor-setup card">
         <label>

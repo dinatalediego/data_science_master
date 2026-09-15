@@ -96,9 +96,13 @@ const ARTIFACT_LABELS: Record<string, string> = {
 export default function ReadingRoomPanel({
   userId,
   courses,
+  focusTaskId = null,
+  onFocusConsumed,
 }: {
   userId: string;
   courses: Course[];
+  focusTaskId?: string | null;
+  onFocusConsumed?: () => void;
 }) {
   const [units, setUnits] = useState<ReadingUnit[]>([]);
   const [sources, setSources] = useState<ReadingSource[]>([]);
@@ -187,6 +191,30 @@ export default function ReadingRoomPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
+  useEffect(() => {
+    if (!focusTaskId || !tasks.length || !templates.length || !units.length) return;
+
+    const task = tasks.find((item) => item.id === focusTaskId);
+    if (!task) return;
+
+    const template = templates.find((item) => item.id === task.template_id);
+    if (!template) return;
+
+    const unit = units.find((item) => item.id === template.reading_unit_id);
+    if (!unit) return;
+
+    setCourseFilter(unit.course_id);
+    setExpandedUnit(unit.id);
+
+    window.setTimeout(() => {
+      document
+        .getElementById(`reading-unit-${unit.id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+
+    onFocusConsumed?.();
+  }, [focusTaskId, tasks, templates, units, onFocusConsumed]);
+
   const courseById = useMemo(
     () => new Map(courses.map((course) => [course.id, course])),
     [courses]
@@ -267,6 +295,27 @@ export default function ReadingRoomPanel({
       setStatus(error.message);
       setBusyTask(null);
       return;
+    }
+
+    if (completed) {
+      const { error: actionLogError } = await supabase.rpc(
+        "sds_log_learning_action_event",
+        {
+          p_action_type: "reading",
+          p_entity_id: task.id,
+          p_event_type: "completed",
+          p_priority_score: null,
+          p_reason: "Reading checklist evidence completed.",
+          p_metadata: {
+            confidence:
+              confidenceValue === null ? null : confidenceValue / 100,
+          },
+        }
+      );
+
+      if (actionLogError) {
+        setStatus(actionLogError.message);
+      }
     }
 
     setTasks((current) =>
