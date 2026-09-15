@@ -156,7 +156,10 @@ The initial migration is in supabase/migrations/0001_socrates_foundation.sql.
 
 ## Live product status
 
-**Production:** https://socrates-ds.vercel.app
+**Canonical production:** https://socrates-ds.vercel.app  
+**Canonical Vercel project:** `socrates-ds`
+
+The duplicate Vercel project named `data_science_master` is intentionally not used as production. All release verification and deployment decisions target only `socrates-ds`.
 
 The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. It also includes a curated Ivy+ Learning Library that links official MIT, Harvard and Stanford sources without mirroring copyrighted course content. The live foundation contains the seven-course program, an Ivy+ Library, persistent Reading Room missions and a source-grounded AI Reading Companion.
 
