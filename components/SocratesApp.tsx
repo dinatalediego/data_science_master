@@ -7,6 +7,15 @@ import TutorPanel from "@/components/TutorPanel";
 import LibraryPanel from "@/components/LibraryPanel";
 import ReadingRoomPanel from "@/components/ReadingRoomPanel";
 import { supabase } from "@/lib/supabase";
+import {
+  ACADEMIC_TERM,
+  academicTermStatus,
+  academicWeeks,
+  formatAcademicDate,
+  nextCourseOccurrence,
+  startOfAcademicTerm,
+  endOfAcademicTerm,
+} from "@/lib/academicTerm";
 import type {
   Concept,
   Course,
@@ -63,26 +72,19 @@ function masteryAverage(item?: Mastery) {
 
 function nextCourse(courses: Course[]) {
   if (!courses.length) return null;
-  const now = new Date();
-  const currentDay = now.getDay() === 0 ? 7 : now.getDay();
-  const nowMinutes = now.getHours() * 60 + now.getMinutes();
 
-  const candidates = courses.map((course) => {
-    const [hour, minute] = shortTime(course.start_time).split(":").map(Number);
-    let deltaDays = course.day_of_week - currentDay;
-    const courseMinutes = hour * 60 + minute;
-
-    if (deltaDays < 0 || (deltaDays === 0 && courseMinutes <= nowMinutes)) {
-      deltaDays += 7;
-    }
-
-    return {
-      course,
-      distance: deltaDays * 1440 + courseMinutes - (deltaDays === 0 ? nowMinutes : 0),
-    };
-  });
-
-  return candidates.sort((a, b) => a.distance - b.distance)[0]?.course || null;
+  return courses
+    .map((course) => {
+      const occurrence = nextCourseOccurrence(
+        course.day_of_week,
+        course.start_time
+      );
+      return occurrence ? { course, occurrence } : null;
+    })
+    .filter(
+      (item): item is { course: Course; occurrence: Date } => Boolean(item)
+    )
+    .sort((a, b) => a.occurrence.getTime() - b.occurrence.getTime())[0] || null;
 }
 
 function Metric({
@@ -226,6 +228,8 @@ export default function SocratesApp() {
 
   const evidencedConcepts = mastery.filter((item) => item.evidence_count > 0);
   const next = nextCourse(courses);
+  const termStatus = academicTermStatus();
+  const termWeeks = academicWeeks();
 
   const recommendation = useMemo(() => {
     const top = learningActions[0];
@@ -424,11 +428,20 @@ export default function SocratesApp() {
             <div className="metrics-grid">
               <Metric
                 label="Próxima clase"
-                value={next ? DAYS[next.day_of_week] : "—"}
+                value={
+                  next
+                    ? `${DAYS[next.course.day_of_week]} ${formatAcademicDate(
+                        next.occurrence,
+                        { year: undefined }
+                      )}`
+                    : "—"
+                }
                 detail={
                   next
-                    ? `${shortTime(next.start_time)} · ${next.name}`
-                    : "Sin cursos cargados"
+                    ? `${shortTime(next.course.start_time)} · ${next.course.name}`
+                    : termStatus.phase === "after"
+                      ? "Ciclo finalizado"
+                      : "Sin sesiones dentro del ciclo"
                 }
               />
               <Metric
@@ -629,6 +642,53 @@ export default function SocratesApp() {
                 </p>
               </div>
             </div>
+
+            <article className="academic-term-card card">
+              <div className="academic-term-heading">
+                <div>
+                  <p className="eyebrow dark">ACADEMIC TERM · SINGLE SOURCE OF TRUTH</p>
+                  <h3>{ACADEMIC_TERM.name}</h3>
+                  <p>
+                    {formatAcademicDate(startOfAcademicTerm())} →{" "}
+                    {formatAcademicDate(endOfAcademicTerm())} · {ACADEMIC_TERM.week_count} semanas ·{" "}
+                    {ACADEMIC_TERM.timezone}
+                  </p>
+                </div>
+                <span className={`term-status ${termStatus.phase}`}>
+                  {termStatus.phase === "before"
+                    ? `Empieza en ${termStatus.days} día${termStatus.days === 1 ? "" : "s"}`
+                    : termStatus.phase === "active"
+                      ? `Semana ${termStatus.currentWeek} en curso`
+                      : "Ciclo finalizado"}
+                </span>
+              </div>
+
+              <div className="academic-week-strip">
+                {termWeeks.map((week) => (
+                  <div
+                    key={week.week}
+                    className={`academic-week ${week.status}`}
+                    title={`Semana ${week.week}: ${formatAcademicDate(week.start)} – ${formatAcademicDate(week.end)}`}
+                  >
+                    <strong>S{String(week.week).padStart(2, "0")}</strong>
+                    <span>
+                      {formatAcademicDate(week.start, {
+                        year: undefined,
+                        month: "short",
+                      })}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="academic-term-note">
+                <strong>Semana 1 = 28 Sep 2026</strong>
+                <span>
+                  Las sesiones recurrentes y la próxima clase ahora respetan este rango.
+                  Las revisiones T+1/T+3/T+7/T+21 siguen dependiendo de cuándo completas evidencia.
+                </span>
+              </div>
+            </article>
 
             <div className="calendar-grid">
               {[1, 2, 3, 4, 6].map((day) => (
