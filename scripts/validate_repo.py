@@ -19,6 +19,10 @@ REQUIRED_FILES = [
     'supabase/migrations/0005_private_reading_ingestion.sql',
     'supabase/migrations/0006_persistent_study_packs.sql',
     'supabase/migrations/0007_next_best_action_engine.sql',
+    'supabase/migrations/0008_reinforcement_engine.sql',
+    'docs/REINFORCEMENT_ENGINE.md',
+    'components/ReinforcementPanel.tsx',
+    'lib/learningActions.ts',
     'supabase/reading_companion_seed.sql',
     'supabase/adaptive_reading_seed.sql',
     'components/ReadingRoomPanel.tsx',
@@ -63,6 +67,14 @@ required_slugs = {
 
 if set(slugs) != required_slugs:
     fail(f'course slug set differs from canonical catalog: {set(slugs) ^ required_slugs}')
+
+term = payload.get('academic_term', {})
+if term.get('nominal_start') != '2026-09-28':
+    fail('academic term nominal_start must be 2026-09-28')
+if term.get('nominal_end') != '2027-01-30':
+    fail('academic term nominal_end must be 2027-01-30')
+if term.get('week_count') != 18:
+    fail('academic term must preserve 18 weeks')
 
 def minutes(value: str) -> int:
     h, m = map(int, value.split(':'))
@@ -117,5 +129,28 @@ for contract in [
     if contract.lower() not in nba_sql.lower():
         fail(f'Next-Best Action contract missing: {contract}')
 
+reinforcement_sql = (ROOT / 'supabase/migrations/0008_reinforcement_engine.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_learning_action_state',
+    'sds_snooze_learning_action',
+    'sds_calibration_profile',
+    'sds_reinforcement_snapshot',
+    'deferral_rescue',
+    'prerequisite_rescue',
+    'calibration_actions',
+]:
+    if contract.lower() not in reinforcement_sql.lower():
+        fail(f'Reinforcement contract missing: {contract}')
+
+reinforcement_ui = (ROOT / 'components/ReinforcementPanel.tsx').read_text(encoding='utf-8')
+for contract in [
+    'Reinforcement Lab',
+    'Posponer 24h',
+    'Calibration gap',
+    'prerrequisitos',
+]:
+    if contract.lower() not in reinforcement_ui.lower():
+        fail(f'Reinforcement UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, Reading Room, retrieval contract and AI grounding safeguards.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards and V1.1 reinforcement contracts.')
