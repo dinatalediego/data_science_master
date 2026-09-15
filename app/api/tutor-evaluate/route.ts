@@ -9,7 +9,7 @@ const FALLBACK_SUPABASE_URL = "https://tlyczyfsboqrtrdpwizp.supabase.co";
 const FALLBACK_SUPABASE_KEY = "sb_publishable_gMTGwNPjdwgNuzzRPpUPyA_ezrPfCrT";
 
 type EvaluationPayload = {
-  score: number;
+  score: number | null;
   evaluatorConfidence: number;
   verdict: "strong" | "partial" | "weak" | "insufficient";
   strengths: string[];
@@ -73,7 +73,6 @@ function parseJsonObject(text: string): Record<string, unknown> | null {
 }
 
 function normalizeEvaluation(raw: Record<string, unknown>): EvaluationPayload | null {
-  const score = clamp01(raw.score);
   const evaluatorConfidence = clamp01(raw.evaluatorConfidence);
   const allowedVerdicts = new Set(["strong", "partial", "weak", "insufficient"]);
   const verdict =
@@ -87,6 +86,11 @@ function normalizeEvaluation(raw: Record<string, unknown>): EvaluationPayload | 
     typeof raw.nextPrompt === "string" ? raw.nextPrompt.trim().slice(0, 1800) : "";
 
   if (!verdict || !feedback) return null;
+
+  const score =
+    verdict === "insufficient" || raw.score === null || raw.score === undefined
+      ? null
+      : clamp01(raw.score);
 
   const rubric =
     raw.rubric && typeof raw.rubric === "object" && !Array.isArray(raw.rubric)
@@ -240,7 +244,8 @@ export async function POST(request: NextRequest) {
     "Separate correctness/coverage from confidence.",
     "Return strict JSON only, with no markdown fences.",
     "Required keys: score, evaluatorConfidence, verdict, strengths, gaps, feedback, nextPrompt, rubric.",
-    "score and evaluatorConfidence must be numbers from 0 to 1.",
+    "score must be a number from 0 to 1, or null only when verdict is insufficient.",
+    "evaluatorConfidence must be a number from 0 to 1.",
     "verdict must be strong, partial, weak, or insufficient.",
     "strengths and gaps must be short arrays of strings.",
     "If the answer guide is too vague to support a reliable judgment, lower evaluatorConfidence and use verdict insufficient.",
