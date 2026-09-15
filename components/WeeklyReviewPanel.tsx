@@ -217,6 +217,19 @@ export default function WeeklyReviewPanel() {
           .join("\n")
       : "- Sin pares pre/post suficientes.";
 
+    const memoryLines = effectiveness.length
+      ? effectiveness
+          .map(
+            (item) =>
+              `- ${item.action_type}: n=${item.paired_outcomes}, Δ observado ${deltaLabel(
+                item.avg_observed_delta === null
+                  ? null
+                  : Number(item.avg_observed_delta)
+              )}, estado=${item.evidence_state}. ${item.interpretation}`
+          )
+          .join("\n")
+      : "- Memoria insuficiente: SÓCRATES esperará más pares antes/después.";
+
     const markdown = [
       "# SÓCRATES DS — Weekly Learning Review",
       "",
@@ -250,6 +263,10 @@ export default function WeeklyReviewPanel() {
       "",
       "## Course coverage",
       courseLines || "- Sin cursos cargados.",
+      "",
+      "## Personal Learning Memory",
+      "_Descriptive · observational · no ranking changes._",
+      memoryLines,
       "",
       "## Intervention outcome ledger",
       "_Observational · not causal._",
