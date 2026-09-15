@@ -23,6 +23,9 @@ REQUIRED_FILES = [
     'supabase/migrations/0009_ai_evidence_evaluator.sql',
     'supabase/migrations/0010_weekly_learning_review.sql',
     'supabase/migrations/0011_intervention_effectiveness_memory.sql',
+    'supabase/migrations/0012_precycle_readiness.sql',
+    'docs/PRECYCLE_READINESS.md',
+    'components/PreCycleLaunchpad.tsx',
     'docs/REINFORCEMENT_ENGINE.md',
     'docs/INTERVENTION_EFFECTIVENESS_MEMORY.md',
     'docs/WEEKLY_LEARNING_REVIEW.md',
@@ -237,5 +240,27 @@ for contract in [
     if contract.lower() not in memory_ui.lower():
         fail(f'Intervention-memory UI contract missing: {contract}')
 
+precycle_sql = (ROOT / 'supabase/migrations/0012_precycle_readiness.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_precycle_course_readiness',
+    'baseline_missing',
+    'source_grounded_pending_tasks',
+    'has_schedule_conflict',
+    'No course is declared',
+]:
+    if contract.lower() not in precycle_sql.lower():
+        fail(f'Pre-cycle readiness SQL contract missing: {contract}')
+
+precycle_ui = (ROOT / 'components/PreCycleLaunchpad.tsx').read_text(encoding='utf-8')
+for contract in [
+    'PRE-CYCLE LAUNCHPAD',
+    'TOP 3',
+    'No intentes',
+    'conflicto horario',
+    'Crear baseline',
+]:
+    if contract.lower() not in precycle_ui.lower():
+        fail(f'Pre-cycle readiness UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, evaluator, weekly-review and V1.4 intervention-memory contracts.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, evaluator, weekly review, personal memory and V1.5 pre-cycle readiness contracts.')
