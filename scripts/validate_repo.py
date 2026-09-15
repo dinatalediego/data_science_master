@@ -110,7 +110,7 @@ for contract in ['sds_user_study_packs', 'source_locators', 'Use only the suppli
 nba_sql = (ROOT / 'supabase/migrations/0007_next_best_action_engine.sql').read_text(encoding='utf-8')
 for contract in [
     'sds_next_best_learning_actions',
-    'overdue spaced retrieval',
+    'due_reviews',
     'sds_learning_action_events',
     'weak_mastery',
 ]:
