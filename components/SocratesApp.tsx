@@ -7,6 +7,7 @@ import TutorPanel from "@/components/TutorPanel";
 import LibraryPanel from "@/components/LibraryPanel";
 import ReadingRoomPanel from "@/components/ReadingRoomPanel";
 import ReinforcementPanel from "@/components/ReinforcementPanel";
+import WeeklyReviewPanel from "@/components/WeeklyReviewPanel";
 import { supabase } from "@/lib/supabase";
 import {
   ACADEMIC_TERM,
@@ -27,7 +28,7 @@ import type {
   ReviewItem,
 } from "@/lib/types";
 
-type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "calendar" | "thesis";
+type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "weekly" | "calendar" | "thesis";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -384,6 +385,7 @@ export default function SocratesApp() {
               ["socrates", "Σ", "Sócrates"],
               ["mastery", "◉", "Mastery"],
               ["reinforcement", "↻", "Reinforcement"],
+              ["weekly", "▤", "Weekly Review"],
               ["calendar", "□", "Calendario"],
               ["thesis", "◇", "Tesis"],
             ].map(([value, icon, label]) => (
@@ -424,7 +426,9 @@ export default function SocratesApp() {
                       ? "Mastery"
                       : tab === "reinforcement"
                         ? "Reinforcement Lab"
-                        : tab === "calendar"
+                        : tab === "weekly"
+                          ? "Weekly Learning Review"
+                          : tab === "calendar"
                           ? "Calendario académico"
                         : "Thesis Lab"}
             </h1>
@@ -727,6 +731,8 @@ export default function SocratesApp() {
             onSnoozeAction={snoozeLearningAction}
           />
         ) : null}
+
+        {tab === "weekly" ? <WeeklyReviewPanel /> : null}
 
         {tab === "calendar" ? (
           <section className="panel-stack">
