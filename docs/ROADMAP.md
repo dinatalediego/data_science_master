@@ -32,7 +32,7 @@ Persistent AI-generated carta, summary, concept cards, infographic spec, practic
 ### V1.0 — Learning OS
 Transparent Next-Best Learning Action queue, top-3 recommendations, audit events, academic-term runtime and the seven-course Campus.
 
-## V1.1 — Reinforcement Engine — current release
+## V1.1 — Reinforcement Engine
 
 Goal: detect where learning is breaking and recommend the smallest useful intervention.
 
@@ -50,23 +50,30 @@ Goal: detect where learning is breaking and recommend the smallest useful interv
 - [x] RLS-isolated action state
 - [ ] production deployment + authenticated smoke test
 
-## V1.2 — Outcome-calibrated adaptation
+## V1.2 — AI Evidence Evaluator — current release
 
-Goal: stop using self-score as the only performance signal.
+Goal: stop using self-score as the only performance signal while preserving uncertainty and provenance.
 
-- rubric/AI-assisted grading with explicit uncertainty
-- human override / review path
-- compare confidence against externally scored performance
-- measure intervention uplift on later recall and transfer
-- challenger policy vs deterministic V1.1 baseline
-- promote challenger only with measurable improvement
-- preserve decision provenance and rollback
+- [x] owner-isolated attempt-evaluation store
+- [x] authenticated evaluator API
+- [x] evaluate only against explicit question + answer guide
+- [x] non-official formative label
+- [x] independent score + evaluator confidence
+- [x] strengths, gaps, feedback and next prompt
+- [x] fallback to self-score when evaluator confidence < 0.65
+- [x] effective-score provenance: evaluator / mixed / self_score
+- [x] Reinforcement Lab upgraded to confidence vs effective evidence
+- [x] provider/model/version/latency audit
+- [ ] real-attempt acceptance test after learner produces evidence
+- [ ] production deployment after Vercel rate-limit reset
 
 ## V1.3 — Weekly Learning Review
 
-Goal: turn the system into an observable learning PMO.
+Goal: turn the system into an observable learning PMO and measure whether interventions actually improve later outcomes.
 
 - weekly evidence recap
+- intervention → later-outcome linkage
+- evaluator coverage and disagreement
 - retention trend
 - calibration trend
 - backlog / deferral trend
