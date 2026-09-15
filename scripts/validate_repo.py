@@ -16,10 +16,13 @@ REQUIRED_FILES = [
     'supabase/migrations/0001_socrates_foundation.sql',
     'supabase/migrations/0003_reading_companion.sql',
     'supabase/migrations/0004_adaptive_reading_ai.sql',
+    'supabase/migrations/0005_private_reading_ingestion.sql',
     'supabase/reading_companion_seed.sql',
     'supabase/adaptive_reading_seed.sql',
     'components/ReadingRoomPanel.tsx',
     'components/ReadingCoachPanel.tsx',
+    'components/ReadingUploadPanel.tsx',
+    'app/api/reading-ingest/route.ts',
     'app/api/reading-coach/route.ts',
     'supabase/seed.sql',
 ]
@@ -89,6 +92,11 @@ for contract in [
 ]:
     if contract not in api_route:
         fail(f'AI reading contract missing: {contract}')
+
+ingest_route = (ROOT / 'app/api/reading-ingest/route.ts').read_text(encoding='utf-8')
+for contract in ['sds-readings', 'storagePath', 'source_hash', 'Private PDF']:
+    if contract not in ingest_route:
+        fail(f'private ingestion contract missing: {contract}')
 
 print('SÓCRATES DS repository validation passed.')
 print(f'Validated {len(courses)} canonical courses, Reading Room, retrieval contract and AI grounding safeguards.')
