@@ -50,7 +50,7 @@ Goal: detect where learning is breaking and recommend the smallest useful interv
 - [x] RLS-isolated action state
 - [ ] production deployment + authenticated smoke test
 
-## V1.2 — AI Evidence Evaluator — current release
+## V1.2 — AI Evidence Evaluator
 
 Goal: stop using self-score as the only performance signal while preserving uncertainty and provenance.
 
@@ -69,18 +69,33 @@ Goal: stop using self-score as the only performance signal while preserving unce
 
 ## V1.3 — Weekly Learning Review
 
-Goal: turn the system into an observable learning PMO and measure whether interventions actually improve later outcomes.
+Goal: turn the system into an observable learning PMO and measure what happens after interventions without claiming causality.
 
-- weekly evidence recap
-- intervention → later-outcome linkage
-- evaluator coverage and disagreement
-- retention trend
-- calibration trend
-- backlog / deferral trend
-- course coverage vs academic week
-- thesis transfer evidence
-- “stop doing / start doing / continue” recommendations
-- exportable learning portfolio
+- [x] weekly evidence recap
+- [x] intervention → later-outcome linkage
+- [x] evaluator coverage
+- [x] calibration trend
+- [x] backlog / deferral trend
+- [x] all-seven-course evidence coverage
+- [x] “stop doing / start doing / continue” recommendations
+- [x] eight-week evidence trace
+- [x] exportable Markdown learning portfolio
+- [x] observational / non-causal outcome labeling
+
+## V1.4 — Intervention Effectiveness Memory — current release
+
+Goal: let learner-specific evidence compound cautiously across weeks.
+
+- [x] intervention-type effectiveness profile
+- [x] concept × intervention memory when sample exists
+- [x] sample-size states: insufficient / emerging / observed
+- [x] average observed delta and positive/stable/negative rates
+- [x] evaluator-pair coverage
+- [x] learner-facing Personal Learning Memory in Weekly Review
+- [x] strict non-causal language
+- [x] policy firewall: memory does not change action ranking
+- [ ] prospective challenger experiment after sufficient paired outcomes
+- [ ] production deployment after Vercel rate-limit reset
 
 ## V2.0 — Personal Learning Intelligence
 
