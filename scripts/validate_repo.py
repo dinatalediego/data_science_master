@@ -20,7 +20,10 @@ REQUIRED_FILES = [
     'supabase/migrations/0006_persistent_study_packs.sql',
     'supabase/migrations/0007_next_best_action_engine.sql',
     'supabase/migrations/0008_reinforcement_engine.sql',
+    'supabase/migrations/0009_ai_evidence_evaluator.sql',
     'docs/REINFORCEMENT_ENGINE.md',
+    'docs/AI_EVIDENCE_EVALUATOR.md',
+    'app/api/tutor-evaluate/route.ts',
     'components/ReinforcementPanel.tsx',
     'lib/learningActions.ts',
     'supabase/reading_companion_seed.sql',
@@ -152,5 +155,36 @@ for contract in [
     if contract.lower() not in reinforcement_ui.lower():
         fail(f'Reinforcement UI contract missing: {contract}')
 
+evaluator_sql = (ROOT / 'supabase/migrations/0009_ai_evidence_evaluator.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_attempt_evaluations',
+    'sds_attempt_effective_scores',
+    'sds_calibration_profile_v2',
+    'evaluator_confidence',
+    'effective_score',
+]:
+    if contract.lower() not in evaluator_sql.lower():
+        fail(f'AI evaluator SQL contract missing: {contract}')
+
+evaluator_route = (ROOT / 'app/api/tutor-evaluate/route.ts').read_text(encoding='utf-8')
+for contract in [
+    'Evaluate a learner response ONLY against the supplied question and answer guide',
+    'non-official',
+    'evaluatorConfidence',
+    'effectiveScoreSource',
+    'disallowPromptTraining',
+]:
+    if contract not in evaluator_route:
+        fail(f'AI evaluator API contract missing: {contract}')
+
+tutor_ui = (ROOT / 'components/TutorPanel.tsx').read_text(encoding='utf-8')
+for contract in [
+    'AI EVIDENCE CONTRAST',
+    'NO OFFICIAL GRADE',
+    'effectiveScoreSource',
+]:
+    if contract not in tutor_ui:
+        fail(f'Tutor evaluator UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards and V1.1 reinforcement contracts.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement and V1.2 evidence-evaluator contracts.')
