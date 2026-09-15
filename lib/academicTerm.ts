@@ -126,3 +126,31 @@ export function nextCourseOccurrence(
 
   return candidate <= endBoundary ? candidate : null;
 }
+
+
+export function academicWeekSessionDate(
+  weekNumber: number,
+  dayOfWeek: number,
+  startTime: string
+) {
+  if (
+    weekNumber < 1 ||
+    weekNumber > ACADEMIC_TERM.week_count ||
+    dayOfWeek < 1 ||
+    dayOfWeek > 7
+  ) {
+    return null;
+  }
+
+  const termStart = startOfAcademicTerm();
+  const termEnd = endOfAcademicTerm();
+  const weekStart = addDays(termStart, (weekNumber - 1) * 7);
+  const sessionDate = addDays(weekStart, dayOfWeek - 1);
+  const [hour, minute] = startTime.slice(0, 5).split(":").map(Number);
+  sessionDate.setHours(hour, minute, 0, 0);
+
+  const endBoundary = new Date(termEnd);
+  endBoundary.setHours(23, 59, 59, 999);
+
+  return sessionDate <= endBoundary ? sessionDate : null;
+}
