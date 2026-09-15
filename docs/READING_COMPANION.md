@@ -2,23 +2,52 @@
 
 ## Product principle
 
-Reading is not completion. A source enters a four-step evidence loop:
+Reading is not completion. Every important source enters a four-step evidence loop:
 
 ```text
 Preview → Active Reading → Explain Without Looking → Practice / Transfer
 ```
 
-An unchecked step remains actionable and becomes the next visible trigger.
+An unchecked step remains actionable and becomes the next visible trigger. Completing the final practice step schedules spaced retrieval; it does **not** promote mastery automatically.
+
+## V0.7 implemented core
+
+The Reading Companion now includes:
+
+- source-aware reading units and explicit locators;
+- concise source chunks for retrieval;
+- reading-unit → concept mappings;
+- evidence-required checklist completion;
+- confidence captured separately from completion;
+- automatic T+1 / T+3 / T+7 / T+21 review scheduling;
+- Campus-level next-reading trigger;
+- an interactive SÓCRATES AI coach;
+- AI interaction audit with source locators;
+- deterministic evidence-only fallback when AI generation is unavailable.
+
+### AI modes
+
+- Explain
+- Socratic
+- Examiner / quiz
+- Derivation
+- Apply / transfer
+- One-page summary
+- Concept cards
+- Infographic specification
+- Adaptive checklist
+
+The server contract requires source-specific claims to use retrieved evidence. If retrieval is insufficient, the tutor must say so instead of filling the gap with general model knowledge.
 
 ## Initial source-grounded pack
 
-The first version is grounded in user-provided copies of:
+The first deep pack is grounded in user-provided copies of:
 
 - James D. Hamilton — *Time Series Analysis*
 - Gilbert Strang — *Linear Algebra and Learning from Data*
 - MIT 14.384 Lecture 1 — *Stationarity, Lag Operator, ARMA, and Covariance Structure*
 
-The app stores bibliographic metadata, locators and original derivative study aids. It does not republish textbook pages.
+SÓCRATES stores bibliographic metadata, locators and concise derivative study aids. It does not republish textbook pages or long passages.
 
 ## First-weeks routes
 
@@ -37,46 +66,41 @@ The app stores bibliographic metadata, locators and original derivative study ai
 
 ### Other courses
 
-The initial routes use the official MIT / Harvard / Stanford resources already curated in the Ivy+ Library. They are marked as official-resource mappings rather than textbook-grounded sections until the actual class syllabus/readings are uploaded.
+Their first routes use official MIT / Harvard / Stanford resources from the Ivy+ Library. These remain labeled as official-resource mappings rather than textbook-grounded sections until their actual class syllabus/readings are available.
 
 ## Checklist semantics
 
-Each reading unit creates four user-owned tasks:
+Each reading unit starts with four user-owned actions:
 
-1. **Preview** — write questions before reading.
+1. **Preview** — formulate questions before reading.
 2. **Read** — identify definitions, assumptions and a difficult point.
-3. **Explain** — close the source and reconstruct the idea.
+3. **Explain** — reconstruct the idea with the source closed.
 4. **Practice** — solve, derive or apply.
 
-Tasks unlock sequentially. The first unfinished unlocked task is the Reading Room's **Next Trigger**.
+Actions unlock sequentially. Completing an action requires a short evidence note and a confidence estimate. The first unfinished unlocked action becomes the visible **Next Trigger**.
 
-Completing a task writes a `reading_task_completed` LearningEvent. It does not automatically increase mastery.
+When the final practice action is completed, SÓCRATES schedules retrieval for mapped prerequisite/core concepts at T+1, T+3, T+7 and T+21.
 
-## AI roadmap
-
-V0.7 should add a private source-grounded tutor:
+## Grounding architecture
 
 ```text
-Private source
+Reading source
    ↓
-parse + chunk
+bounded source notes + locator
    ↓
-source locator / provenance
+retrieval for selected unit
    ↓
-retrieval
+SÓCRATES AI
+   ├─ explanation
+   ├─ Socratic question
+   ├─ quiz
+   ├─ derivation
+   ├─ transfer
+   └─ generated study artifact
    ↓
-artifact factory
-   ├─ concise brief
-   ├─ concept cards
-   ├─ infographic spec
-   ├─ derivation walkthrough
-   ├─ practice set
-   ├─ Socratic dialogue
-   └─ adaptive checklist
+source locators shown to learner
    ↓
-learner evidence
-   ↓
-next-best intervention
+interaction audit
 ```
 
 ### Non-negotiables
@@ -87,15 +111,8 @@ next-best intervention
 - Separate confidence from correctness.
 - A checked reading does not equal mastery.
 - Weak evidence should trigger targeted remediation, not another entire course.
-- Every recommendation should say why it was selected.
+- Every recommendation should be explainable.
 
-## Adaptive trigger policy — target behavior
+## Next frontier — V0.8
 
-Examples:
-
-- Preview incomplete → keep it as next action.
-- Read complete, Explain incomplete → trigger closed-book explanation.
-- Explain confidence high + weak performance → trigger misconception diagnostic.
-- Practice weak → route to a smaller prerequisite unit.
-- Unit complete → schedule T+1 / T+3 / T+7 retrieval.
-- Repeated deferral → reduce scope to a 10–15 minute rescue mission.
+The next major increment is private ingestion of new user-provided syllabi, papers, slides and books with page-aware parsing/chunking. That will let every new course reading enter the same grounded workflow without hand-authored seed data.
