@@ -3535,3 +3535,142 @@ textarea {
     flex-direction: column;
   }
 }
+
+
+/* V1.2 — AI Evidence Evaluator */
+.evaluator-panel {
+  margin-top: 14px;
+  padding: 18px;
+  border: 1px solid #dce5f0;
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 92% 8%, rgba(61, 114, 179, 0.10), transparent 26%),
+    linear-gradient(145deg, #f9fbfe, #fffdf8);
+}
+
+.evaluator-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.evaluator-heading h4 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+}
+
+.evaluator-verdict {
+  min-width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.evaluator-verdict.strong {
+  background: #e7f6ed;
+  color: #28704f;
+}
+
+.evaluator-verdict.partial {
+  background: #fff4df;
+  color: #886126;
+}
+
+.evaluator-verdict.weak {
+  background: #fcebea;
+  color: #98463d;
+}
+
+.evaluator-verdict.insufficient {
+  background: #edf0f4;
+  color: #657287;
+}
+
+.evaluator-loading {
+  margin-top: 13px;
+  padding: 11px 12px;
+  border-radius: 12px;
+  background: #eef4fb;
+  color: #446991;
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.evaluator-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 13px;
+}
+
+.evaluator-meta span {
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: #eef2f7;
+  color: #657389;
+  font-size: 8px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.evaluator-list,
+.evaluator-feedback,
+.evaluator-next {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #e7ebf0;
+}
+
+.evaluator-list > strong,
+.evaluator-feedback > strong,
+.evaluator-next > strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #4d5d72;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.evaluator-list ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.evaluator-list li,
+.evaluator-feedback p,
+.evaluator-next p {
+  color: #647188;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+.evaluator-list.strengths li::marker {
+  color: #2c7554;
+}
+
+.evaluator-list.gaps li::marker {
+  color: #a05b45;
+}
+
+.evaluator-next {
+  padding: 13px;
+  border: 1px solid #e8e1d4;
+  border-radius: 13px;
+  background: #fffaf0;
+}
+
+.evaluator-next strong {
+  color: #80602e;
+}
+
+.evaluator-status {
+  margin-top: 12px !important;
+}
