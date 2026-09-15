@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Course } from "@/lib/types";
 import ReadingCoachPanel from "@/components/ReadingCoachPanel";
+import ReadingUploadPanel from "@/components/ReadingUploadPanel";
 
 type ReadingSource = {
   id: string;
@@ -343,6 +344,20 @@ export default function ReadingRoomPanel({
           <small>{completedCount}/{totalCount} acciones</small>
         </div>
       </div>
+
+      <ReadingUploadPanel
+        courses={courses}
+        onComplete={async (result) => {
+          await load();
+          setCourseFilter(result.courseId);
+          setExpandedUnit(result.readingUnitId);
+          window.setTimeout(() => {
+            document
+              .getElementById(`reading-unit-${result.readingUnitId}`)
+              ?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 120);
+        }}
+      />
 
       {nextAction ? (
         <article className="reading-trigger card">
