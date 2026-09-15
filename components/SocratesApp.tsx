@@ -14,6 +14,7 @@ import {
   ACADEMIC_TERM,
   academicTermStatus,
   academicWeeks,
+  academicWeekSessionDate,
   formatAcademicDate,
   nextCourseOccurrence,
   startOfAcademicTerm,
@@ -111,6 +112,9 @@ export default function SocratesApp() {
   const [focusTutorActionType, setFocusTutorActionType] = useState<LearningActionType | null>(null);
   const [focusTutorActionEntityId, setFocusTutorActionEntityId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
+  const [selectedAcademicWeek, setSelectedAcademicWeek] = useState(
+    () => academicTermStatus().currentWeek || 1
+  );
   const [error, setError] = useState("");
 
   const loadData = useCallback(async () => {
@@ -224,6 +228,21 @@ export default function SocratesApp() {
   const next = nextCourse(courses);
   const termStatus = academicTermStatus();
   const termWeeks = academicWeeks();
+  const selectedWeek =
+    termWeeks.find((item) => item.week === selectedAcademicWeek) || termWeeks[0];
+  const selectedWeekSessions = courses
+    .map((course) => {
+      const date = academicWeekSessionDate(
+        selectedAcademicWeek,
+        course.day_of_week,
+        course.start_time
+      );
+      return date ? { course, date } : null;
+    })
+    .filter(
+      (item): item is { course: Course; date: Date } => Boolean(item)
+    )
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
 
   const recommendation = useMemo(() => {
     const top = learningActions[0];
@@ -796,10 +815,13 @@ export default function SocratesApp() {
 
               <div className="academic-week-strip">
                 {termWeeks.map((week) => (
-                  <div
+                  <button
+                    type="button"
                     key={week.week}
-                    className={`academic-week ${week.status}`}
+                    className={`academic-week ${week.status} ${selectedAcademicWeek === week.week ? "selected" : ""}`}
                     title={`Semana ${week.week}: ${formatAcademicDate(week.start)} – ${formatAcademicDate(week.end)}`}
+                    aria-pressed={selectedAcademicWeek === week.week}
+                    onClick={() => setSelectedAcademicWeek(week.week)}
                   >
                     <strong>S{String(week.week).padStart(2, "0")}</strong>
                     <span>
@@ -808,9 +830,65 @@ export default function SocratesApp() {
                         month: "short",
                       })}
                     </span>
-                  </div>
+                  </button>
                 ))}
               </div>
+
+              {selectedWeek ? (
+                <div className="academic-week-agenda">
+                  <div className="academic-week-agenda-heading">
+                    <div>
+                      <p className="eyebrow dark">WEEK {selectedWeek.week} · DATED AGENDA</p>
+                      <h4>
+                        {formatAcademicDate(selectedWeek.start)} →{" "}
+                        {formatAcademicDate(selectedWeek.end)}
+                      </h4>
+                    </div>
+                    <span>{selectedWeekSessions.length} sesiones</span>
+                  </div>
+
+                  <div className="academic-session-list">
+                    {selectedWeekSessions.map(({ course, date }) => {
+                      const conflict = courses.some(
+                        (other) =>
+                          other.id !== course.id &&
+                          other.day_of_week === course.day_of_week &&
+                          Math.max(
+                            Number(course.start_time.slice(0, 2)) * 60 +
+                              Number(course.start_time.slice(3, 5)),
+                            Number(other.start_time.slice(0, 2)) * 60 +
+                              Number(other.start_time.slice(3, 5))
+                          ) <
+                            Math.min(
+                              Number(course.end_time.slice(0, 2)) * 60 +
+                                Number(course.end_time.slice(3, 5)),
+                              Number(other.end_time.slice(0, 2)) * 60 +
+                                Number(other.end_time.slice(3, 5))
+                            )
+                      );
+
+                      return (
+                        <article className="academic-session-row" key={course.id}>
+                          <span className={`course-dot ${course.color_token}`} />
+                          <div>
+                            <strong>{course.name}</strong>
+                            <small>
+                              {formatAcademicDate(date, {
+                                year: undefined,
+                                weekday: "long",
+                              })}{" "}
+                              · {shortTime(course.start_time)}–{shortTime(course.end_time)}
+                            </small>
+                          </div>
+                          {conflict ? (
+                            <span className="academic-session-conflict">overlap</span>
+                          ) : null}
+                        </article>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
 
               <div className="academic-term-note">
                 <strong>Semana 1 = 28 Sep 2026</strong>
