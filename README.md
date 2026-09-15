@@ -1,6 +1,6 @@
 # SÓCRATES DS — Personal Learning Campus
 
-> **V1.4 — Personal Learning Intelligence Seed**
+> **V1.5 — Evidence-First Pre-Cycle Learning OS**
 >
 > A personal learning operating system for mastering a Data Science graduate program through evidence, retrieval, deliberate practice, transfer, and reflection — not passive content consumption.
 
@@ -179,6 +179,7 @@ Implemented product surfaces:
 - AI Evidence Evaluator that contrasts tutor responses only against explicit answer guides, preserves uncertainty, and falls back transparently to self-score
 - Weekly Learning Review with Stop/Start/Continue, eight-week evidence trajectory and exportable Markdown portfolio
 - Personal Learning Memory that summarizes observed intervention outcomes with explicit sample-size and non-causal gates
+- Pre-Cycle Readiness Launchpad that uses the runway before Week 1 for bounded baselines, source-grounded foundations and schedule-risk preparation
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
