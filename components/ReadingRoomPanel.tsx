@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Course } from "@/lib/types";
+import ReadingCoachPanel from "@/components/ReadingCoachPanel";
 
 type ReadingSource = {
   id: string;
@@ -107,6 +108,9 @@ export default function ReadingRoomPanel({
   const [expandedUnit, setExpandedUnit] = useState<string | null>(null);
   const [openArtifact, setOpenArtifact] = useState<string | null>(null);
   const [busyTask, setBusyTask] = useState<string | null>(null);
+  const [evidenceTask, setEvidenceTask] = useState<string | null>(null);
+  const [evidenceText, setEvidenceText] = useState("");
+  const [confidence, setConfidence] = useState(70);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState("");
 
@@ -240,38 +244,81 @@ export default function ReadingRoomPanel({
   const totalCount = tasks.length;
   const overall = totalCount ? Math.round((completedCount / totalCount) * 100) : 0;
 
-  async function toggleTask(template: TaskTemplate, task: UserTask | undefined) {
-    if (!task) return;
-    const nextStatus = task.status === "completed" ? "pending" : "completed";
+  async function setTaskState(
+    task: UserTask,
+    completed: boolean,
+    evidence = "",
+    confidenceValue: number | null = null
+  ) {
     setBusyTask(task.id);
     setStatus("");
 
-    const { error } = await supabase
-      .from("sds_user_reading_tasks")
-      .update({
-        status: nextStatus,
-        completed_at: nextStatus === "completed" ? new Date().toISOString() : null,
-      })
-      .eq("id", task.id)
-      .eq("user_id", userId);
+    const { data, error } = await supabase.rpc("sds_set_reading_task", {
+      p_user_task_id: task.id,
+      p_completed: completed,
+      p_evidence: evidence.trim() || null,
+      p_confidence:
+        confidenceValue === null ? null : Math.max(0, Math.min(confidenceValue / 100, 1)),
+    });
 
     if (error) {
       setStatus(error.message);
-    } else {
-      setTasks((current) =>
-        current.map((item) =>
-          item.id === task.id
-            ? {
-                ...item,
-                status: nextStatus,
-                completed_at:
-                  nextStatus === "completed" ? new Date().toISOString() : null,
-              }
-            : item
-        )
+      setBusyTask(null);
+      return;
+    }
+
+    setTasks((current) =>
+      current.map((item) =>
+        item.id === task.id
+          ? {
+              ...item,
+              status: completed ? "completed" : "pending",
+              completed_at: completed ? new Date().toISOString() : null,
+              evidence: completed
+                ? {
+                    ...item.evidence,
+                    reflection: evidence.trim() || null,
+                    confidence:
+                      confidenceValue === null ? null : confidenceValue / 100,
+                  }
+                : item.evidence,
+            }
+          : item
+      )
+    );
+
+    const scheduledReviews =
+      typeof data === "object" && data && "scheduled_reviews" in data
+        ? Number((data as { scheduled_reviews?: number }).scheduled_reviews || 0)
+        : 0;
+
+    if (scheduledReviews > 0) {
+      setStatus(
+        `Misión cerrada. SÓCRATES programó ${scheduledReviews} revisiones T+1/T+3/T+7/T+21.`
       );
     }
+
+    setEvidenceTask(null);
+    setEvidenceText("");
+    setConfidence(70);
     setBusyTask(null);
+  }
+
+  function requestCompletion(task: UserTask, checked: boolean) {
+    if (checked) {
+      void setTaskState(task, false);
+      return;
+    }
+
+    setEvidenceTask(task.id);
+    const previousReflection =
+      typeof task.evidence?.reflection === "string" ? task.evidence.reflection : "";
+    setEvidenceText(previousReflection);
+    const previousConfidence =
+      typeof task.evidence?.confidence === "number"
+        ? Math.round(task.evidence.confidence * 100)
+        : 70;
+    setConfidence(previousConfidence);
   }
 
   if (loading) {
@@ -445,6 +492,8 @@ export default function ReadingRoomPanel({
                 ) : null
               )}
 
+              <ReadingCoachPanel readingUnitId={unit.id} unitTitle={unit.title} />
+
               <button
                 className="reading-expand"
                 type="button"
@@ -471,8 +520,8 @@ export default function ReadingRoomPanel({
                           type="button"
                           className="task-check"
                           disabled={!unlocked || !task || busyTask === task.id}
-                          onClick={() => void toggleTask(template, task)}
-                          aria-label={checked ? "Marcar pendiente" : "Marcar completado"}
+                          onClick={() => task && requestCompletion(task, checked)}
+                          aria-label={checked ? "Marcar pendiente" : "Registrar evidencia"}
                         >
                           {checked ? "✓" : index + 1}
                         </button>
@@ -481,11 +530,64 @@ export default function ReadingRoomPanel({
                             <span>{template.task_type}</span>
                             <span>{template.estimated_minutes} min</span>
                             {!unlocked ? <span>bloqueado</span> : null}
+                            {checked ? <span>evidencia registrada</span> : null}
                           </div>
                           <strong>{template.title}</strong>
                           <p>{template.instructions}</p>
                           {template.evidence_expected ? (
                             <small>Evidencia: {template.evidence_expected}</small>
+                          ) : null}
+
+                          {task && evidenceTask === task.id && !checked ? (
+                            <div className="task-evidence-form">
+                              <label>
+                                Evidencia breve
+                                <textarea
+                                  value={evidenceText}
+                                  onChange={(event) => setEvidenceText(event.target.value)}
+                                  rows={3}
+                                  placeholder={template.evidence_expected || "¿Qué produjiste o pudiste explicar?"}
+                                />
+                              </label>
+
+                              <label className="confidence-field">
+                                <span>
+                                  Confianza antes de comprobarlo
+                                  <strong>{confidence}%</strong>
+                                </span>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="100"
+                                  step="5"
+                                  value={confidence}
+                                  onChange={(event) => setConfidence(Number(event.target.value))}
+                                />
+                              </label>
+
+                              <div className="task-evidence-actions">
+                                <button
+                                  type="button"
+                                  className="text-button"
+                                  onClick={() => {
+                                    setEvidenceTask(null);
+                                    setEvidenceText("");
+                                  }}
+                                >
+                                  Cancelar
+                                </button>
+                                <button
+                                  type="button"
+                                  className="primary-button"
+                                  disabled={busyTask === task.id || !evidenceText.trim()}
+                                  onClick={() =>
+                                    void setTaskState(task, true, evidenceText, confidence)
+                                  }
+                                >
+                                  {busyTask === task.id ? "Guardando…" : "Registrar y completar"}
+                                </button>
+                              </div>
+                            </div>
                           ) : null}
                         </div>
                       </div>

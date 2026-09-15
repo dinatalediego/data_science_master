@@ -18,6 +18,21 @@ import type {
 
 type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "calendar" | "thesis";
 
+type NextReadingAction = {
+  user_task_id: string;
+  reading_unit_id: string;
+  course_id: string;
+  course_name: string;
+  unit_title: string;
+  week_label: string;
+  task_title: string;
+  task_type: string;
+  instructions: string;
+  estimated_minutes: number;
+  source_locator: string | null;
+  trigger_reason: string;
+};
+
 const DAYS: Record<number, string> = {
   1: "Lunes",
   2: "Martes",
@@ -98,6 +113,7 @@ export default function SocratesApp() {
   const [mastery, setMastery] = useState<Mastery[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [misconceptions, setMisconceptions] = useState<Misconception[]>([]);
+  const [nextReading, setNextReading] = useState<NextReadingAction | null>(null);
   const [error, setError] = useState("");
 
   const loadData = useCallback(async () => {
@@ -115,6 +131,7 @@ export default function SocratesApp() {
         masteryResult,
         reviewsResult,
         misconceptionsResult,
+        nextReadingResult,
       ] = await Promise.all([
         supabase
           .from("sds_courses")
@@ -139,6 +156,7 @@ export default function SocratesApp() {
           .eq("user_id", session.user.id)
           .in("status", ["open", "improving", "reopened"])
           .order("severity", { ascending: false }),
+        supabase.rpc("sds_next_reading_action"),
       ]);
 
       const firstError =
@@ -147,7 +165,8 @@ export default function SocratesApp() {
         linksResult.error ||
         masteryResult.error ||
         reviewsResult.error ||
-        misconceptionsResult.error;
+        misconceptionsResult.error ||
+        nextReadingResult.error;
 
       if (firstError) throw firstError;
 
@@ -157,6 +176,8 @@ export default function SocratesApp() {
       setMastery((masteryResult.data || []) as Mastery[]);
       setReviews((reviewsResult.data || []) as ReviewItem[]);
       setMisconceptions((misconceptionsResult.data || []) as Misconception[]);
+      const readingRows = (nextReadingResult.data || []) as NextReadingAction[];
+      setNextReading(readingRows[0] || null);
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : "No se pudo cargar el Campus.");
     } finally {
@@ -217,6 +238,15 @@ export default function SocratesApp() {
       };
     }
 
+    if (nextReading) {
+      return {
+        kicker: "READING TRIGGER",
+        title: nextReading.task_title,
+        body: `${nextReading.instructions} · ${nextReading.course_name} · ${nextReading.estimated_minutes} min`,
+        action: "Abrir Reading Room",
+      };
+    }
+
     if (!evidencedConcepts.length) {
       return {
         kicker: "FIRST EVIDENCE",
@@ -237,7 +267,7 @@ export default function SocratesApp() {
       body: "La recomendación se basa en la evidencia registrada, no en el porcentaje de contenido consumido.",
       action: "Practicar ahora",
     };
-  }, [dueReviews, evidencedConcepts, conceptById]);
+  }, [dueReviews, nextReading, evidencedConcepts, conceptById]);
 
   if (authLoading) {
     return (
@@ -252,7 +282,11 @@ export default function SocratesApp() {
     return <AuthPanel onAuthenticated={() => void supabase.auth.getSession().then(({ data }) => setSession(data.session))} />;
   }
 
-  function goTutor() {
+  function goRecommendedAction() {
+    if (!dueReviews.length && nextReading) {
+      setTab("reading");
+      return;
+    }
     setTab("socrates");
   }
 
@@ -338,7 +372,7 @@ export default function SocratesApp() {
                 <p className="eyebrow">NEXT-BEST LEARNING ACTION</p>
                 <h2>{recommendation.title}</h2>
                 <p>{recommendation.body}</p>
-                <button className="light-button" onClick={goTutor}>
+                <button className="light-button" onClick={goRecommendedAction}>
                   {recommendation.action} →
                 </button>
               </div>

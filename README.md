@@ -1,6 +1,6 @@
 # SÓCRATES DS — Personal Learning Campus
 
-> **V0.1 — Foundation**
+> **V0.7 — AI Reading Companion**
 >
 > A personal learning operating system for mastering a Data Science graduate program through evidence, retrieval, deliberate practice, transfer, and reflection — not passive content consumption.
 
@@ -158,14 +158,17 @@ The initial migration is in supabase/migrations/0001_socrates_foundation.sql.
 
 **Production:** https://socrates-ds.vercel.app
 
-The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. It also includes a curated Ivy+ Learning Library that links official MIT, Harvard and Stanford sources without mirroring copyrighted course content. The live data foundation contains 7 courses, 24 starter concepts, 9 prerequisite edges and 14 tutor prompts.
+The current product is live on Vercel and connected to the shared Supabase project through an isolated `sds_` namespace. It also includes a curated Ivy+ Learning Library that links official MIT, Harvard and Stanford sources without mirroring copyrighted course content. The live foundation contains the seven-course program, an Ivy+ Library, persistent Reading Room missions and a source-grounded AI Reading Companion.
 
 Implemented product surfaces:
 
 - Supabase email/password authentication
 - Campus Home with transparent next-best-action heuristic
 - seven course workspaces
-- Ivy+ Learning Library with official MIT, Harvard and Stanford resources mapped to your courses and concepts
+- Ivy+ Learning Library with official MIT, Harvard and Stanford resources mapped to courses and concepts
+- Reading Room with source-grounded first-weeks routes, persistent evidence checklists and next-action triggers
+- AI Reading Coach with explanation, Socratic, quiz, derivation, transfer and artifact-generation modes
+- automatic T+1/T+3/T+7/T+21 retrieval scheduling after completed reading missions
 - mastery evidence view
 - academic weekly calendar and explicit Monday conflict
 - thesis transfer workspace
@@ -196,9 +199,9 @@ V0.1 is a **foundation release**, not yet the production web app.
 
 ## Next milestone
 
-**V0.2 — First deployable Campus**
+**V0.8 — Private ingestion**
 
-Build the authenticated Next.js shell, connect Supabase, render the seven courses and academic calendar, show the Monday schedule conflict, and create the first “Today” learning dashboard.
+Let new syllabi, papers, slides and user-provided books enter the same source-grounded pipeline automatically: page-aware parsing, provenance, bounded retrieval, artifact drafts and human approval.
 
 ---
 

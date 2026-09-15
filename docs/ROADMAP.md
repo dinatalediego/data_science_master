@@ -1,82 +1,76 @@
 # Roadmap
 
-## V0.1 — Foundation
+## Shipped foundation
 
-Goal: define the product, learning system and persistence contract.
+### V0.1 — Foundation
+Canonical seven-course catalog, architecture, domain model, learning constitution, Supabase foundation and repository validation.
 
-- canonical seven-course catalog
-- architecture
-- domain model
-- learning constitution
-- Campus specification
-- Supabase migration and seed
-- repository validation
+### V0.2 — Campus
+Authenticated Next.js product, Campus Home, courses, academic schedule, Vercel production and Supabase data access.
 
-## V0.2 — First deployable Campus
+### V0.3 — Evidence loop
+Learning sessions, attempts, confidence, mastery dimensions, misconceptions, spaced review queue and append-first learning events.
 
-Goal: create a useful authenticated web product.
+### V0.4 — Experience + tutor baseline
+Museum/library visual direction, SÓCRATES practice modes, source-aware UI and stronger learning-state UX.
 
-- Next.js + TypeScript + Tailwind
-- Supabase Auth
-- server/client data access boundaries
-- Campus Home
-- course list and workspace
-- academic calendar
-- Monday conflict UI
-- first Vercel deployment
+### V0.5 — Authentication
+Google Sign-In as preferred path; email/password retained as backup.
 
-## V0.3 — Evidence loop
+### V0.6 — Ivy+ Library + Reading Room
+MIT/Harvard/Stanford curation, first-weeks reading routes, persistent checklists and source-derived study artifacts.
 
-Goal: make studying observable.
+## V0.7 — AI Reading Companion — current release
 
-- learning-session capture
-- questions and attempts
-- confidence capture
-- mastery dimensions
-- misconceptions
-- review queue
-- weekly learning review
+Goal: turn readings into adaptive evidence loops.
 
-## V0.4 — SÓCRATES tutor
+- [x] source-grounded Hamilton / Strang / MIT 14.384 pack
+- [x] reading-unit → concept mappings
+- [x] evidence-required checklist actions
+- [x] confidence captured separately
+- [x] first incomplete action becomes a Campus trigger
+- [x] T+1 / T+3 / T+7 / T+21 review scheduling
+- [x] source retrieval with locators
+- [x] AI modes: explain, Socratic, quiz, derive, apply, summary, cards, infographic spec, checklist
+- [x] AI interaction audit
+- [x] evidence-only fallback if live AI is unavailable
+- [x] CI safeguards for grounding contract
+- [ ] production deployment + smoke test
 
-Goal: adaptive tutoring with explicit modes.
+## V0.8 — Private ingestion
 
-- Socratic mode
-- Professor mode
-- Feynman mode
-- Examiner mode
-- session summaries
-- evidence writes with human review
+Goal: make new course material self-service while preserving provenance.
 
-## V0.5 — Calendar Intelligence
+- private upload workflow for syllabi, books, papers and slides
+- page-aware parsing and chunking
+- source/version registry
+- reading-unit proposal from syllabus/week structure
+- automatic artifact drafts with human approval
+- source coverage and retrieval-quality tests
 
-Goal: turn classes into learning envelopes.
+## V0.9 — Adaptive learning engine
 
-- Google Calendar read integration
-- pre-class diagnostic suggestions
-- post-class recall queue
-- spaced reviews
-- catch-up workflow for missed or overlapping classes
+Goal: choose smaller, more effective interventions.
 
-## V0.6 — Knowledge graph
+- misconception diagnostics from answer evidence
+- prerequisite rescue missions
+- confidence × performance calibration
+- adaptive difficulty
+- repeated-deferral detection
+- 10–15 minute rescue missions
+- retrieval scheduling tuned from observed performance
 
-Goal: diagnose prerequisite gaps across courses.
+## V1.0 — Learning OS
 
-- concept dependency graph
-- prerequisite bottleneck analysis
-- cross-course concept reuse
-- visualization
+Goal: one coherent operating system for the seven courses and thesis.
 
-## V0.7 — Thesis integration
-
-Goal: make the thesis the transfer layer.
-
-- thesis question and hypotheses
-- evidence register
-- method decisions
-- concept-to-thesis links
-- reproducibility checklist
+- class → reading → retrieval → practice → transfer cycle
+- cross-course concept graph
+- thesis as transfer layer
+- measurable weekly learning review
+- auditable next-best learning action
+- reproducible learning portfolio
 
 ## Product gate
 
-Do not add autonomous agents or sophisticated predictive models until the manual evidence loop is demonstrably useful. Prefer transparent rules first, then automate repeated decisions with observed data.
+Do not optimize for more AI output. Optimize for better evidence of learning. Transparent rules remain the default; automation earns scope only after observed usefulness.
