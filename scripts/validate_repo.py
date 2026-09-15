@@ -21,7 +21,11 @@ REQUIRED_FILES = [
     'supabase/migrations/0007_next_best_action_engine.sql',
     'supabase/migrations/0008_reinforcement_engine.sql',
     'supabase/migrations/0009_ai_evidence_evaluator.sql',
+    'supabase/migrations/0010_weekly_learning_review.sql',
     'docs/REINFORCEMENT_ENGINE.md',
+    'docs/WEEKLY_LEARNING_REVIEW.md',
+    'components/WeeklyReviewPanel.tsx',
+    'lib/weeklyReview.ts',
     'docs/AI_EVIDENCE_EVALUATOR.md',
     'app/api/tutor-evaluate/route.ts',
     'components/ReinforcementPanel.tsx',
@@ -186,5 +190,29 @@ for contract in [
     if contract not in tutor_ui:
         fail(f'Tutor evaluator UI contract missing: {contract}')
 
+weekly_sql = (ROOT / 'supabase/migrations/0010_weekly_learning_review.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_weekly_learning_snapshot',
+    'sds_weekly_course_evidence',
+    'sds_weekly_learning_history',
+    'sds_intervention_outcomes',
+    'America/Lima',
+    'Observational',
+]:
+    if contract.lower() not in weekly_sql.lower():
+        fail(f'Weekly review SQL contract missing: {contract}')
+
+weekly_ui = (ROOT / 'components/WeeklyReviewPanel.tsx').read_text(encoding='utf-8')
+for contract in [
+    'WEEKLY LEARNING REVIEW',
+    'STOP DOING',
+    'START DOING',
+    'CONTINUE',
+    'Observational',
+    'Exportar portfolio .md',
+]:
+    if contract.lower() not in weekly_ui.lower():
+        fail(f'Weekly review UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement and V1.2 evidence-evaluator contracts.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, V1.2 evaluator and V1.3 weekly-review contracts.')
