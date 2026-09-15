@@ -4146,3 +4146,26 @@ textarea {
     text-align: left;
   }
 }
+
+
+.week-selector-actions {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
+}
+
+.weekly-export-button {
+  font-size: 8px;
+  padding: 4px 0;
+  color: #6b5a3d;
+}
+
+@media (max-width: 720px) {
+  .week-selector-actions {
+    justify-items: stretch;
+  }
+
+  .weekly-export-button {
+    text-align: left;
+  }
+}
