@@ -22,7 +22,9 @@ REQUIRED_FILES = [
     'supabase/migrations/0008_reinforcement_engine.sql',
     'supabase/migrations/0009_ai_evidence_evaluator.sql',
     'supabase/migrations/0010_weekly_learning_review.sql',
+    'supabase/migrations/0011_intervention_effectiveness_memory.sql',
     'docs/REINFORCEMENT_ENGINE.md',
+    'docs/INTERVENTION_EFFECTIVENESS_MEMORY.md',
     'docs/WEEKLY_LEARNING_REVIEW.md',
     'components/WeeklyReviewPanel.tsx',
     'lib/weeklyReview.ts',
@@ -214,5 +216,26 @@ for contract in [
     if contract.lower() not in weekly_ui.lower():
         fail(f'Weekly review UI contract missing: {contract}')
 
+memory_sql = (ROOT / 'supabase/migrations/0011_intervention_effectiveness_memory.sql').read_text(encoding='utf-8')
+for contract in [
+    'sds_intervention_effectiveness_profile',
+    'sds_intervention_effectiveness_by_concept',
+    'paired_outcomes >= 5',
+    'does not',
+    'caus',
+]:
+    if contract.lower() not in memory_sql.lower():
+        fail(f'Intervention-memory SQL contract missing: {contract}')
+
+memory_ui = (ROOT / 'components/WeeklyReviewPanel.tsx').read_text(encoding='utf-8')
+for contract in [
+    'PERSONAL LEARNING MEMORY',
+    'Minimum gate',
+    'no cambia el ranking',
+    'causalidad',
+]:
+    if contract.lower() not in memory_ui.lower():
+        fail(f'Intervention-memory UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, V1.2 evaluator and V1.3 weekly-review contracts.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, evaluator, weekly-review and V1.4 intervention-memory contracts.')
