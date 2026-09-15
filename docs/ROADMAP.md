@@ -97,7 +97,7 @@ Goal: let learner-specific evidence compound cautiously across weeks.
 - [ ] prospective challenger experiment after sufficient paired outcomes
 - [ ] production deployment after Vercel rate-limit reset
 
-## V1.5 — Pre-Cycle Readiness Launchpad — current release
+## V1.5 — Pre-Cycle Readiness Launchpad
 
 Goal: use the runway before 28 Sep to establish evidence and reduce Week-1 friction without overloading the learner.
 
@@ -111,6 +111,19 @@ Goal: use the runway before 28 Sep to establish evidence and reduce Week-1 frict
 - [x] Monday overlap surfaced before Week 1
 - [x] Launchpad disappears automatically after the term starts
 - [x] no readiness score from passive consumption
+- [ ] production deployment after Vercel rate-limit reset
+
+## V1.6 — Academic Week Intelligence — current release
+
+Goal: turn the 18-week calendar into a dated operational agenda.
+
+- [x] selectable S01–S18 strip
+- [x] exact class dates derived from canonical term start
+- [x] chronological per-week agenda
+- [x] actual-date Monday overlap flag
+- [x] keyboard-accessible week selection
+- [x] no duplicate dated-session store
+- [x] no session outside academic-term bounds
 - [ ] production deployment after Vercel rate-limit reset
 
 ## V2.0 — Personal Learning Intelligence
