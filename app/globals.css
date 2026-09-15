@@ -2964,3 +2964,125 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Academic term calendar */
+.academic-term-card {
+  display: grid;
+  gap: 18px;
+  padding: clamp(20px, 3vw, 30px);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(183, 138, 69, 0.12), transparent 24%),
+    linear-gradient(135deg, #fffdf8, #ffffff);
+}
+
+.academic-term-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.academic-term-heading h3 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 3vw, 34px);
+  letter-spacing: -0.025em;
+}
+
+.academic-term-heading p:not(.eyebrow) {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.term-status {
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 8px 11px;
+  font-size: 9px;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.term-status.before {
+  background: #fff2db;
+  color: #865e1e;
+}
+
+.term-status.active {
+  background: #eaf6ef;
+  color: #267052;
+}
+
+.term-status.after {
+  background: #eef1f5;
+  color: #667388;
+}
+
+.academic-week-strip {
+  display: grid;
+  grid-template-columns: repeat(18, minmax(54px, 1fr));
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.academic-week {
+  min-width: 54px;
+  display: grid;
+  gap: 3px;
+  padding: 10px 8px;
+  border: 1px solid #e6e9ee;
+  border-radius: 12px;
+  background: white;
+}
+
+.academic-week strong {
+  font-size: 10px;
+}
+
+.academic-week span {
+  color: #7b8799;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.academic-week.current {
+  border-color: #b78a45;
+  background: #fff8ea;
+  box-shadow: inset 0 0 0 1px rgba(183, 138, 69, 0.15);
+}
+
+.academic-week.completed {
+  opacity: 0.58;
+}
+
+.academic-term-note {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid #ece8df;
+}
+
+.academic-term-note strong {
+  color: #5f4824;
+  font-size: 10px;
+}
+
+.academic-term-note span {
+  max-width: 760px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (max-width: 760px) {
+  .academic-term-heading,
+  .academic-term-note {
+    flex-direction: column;
+  }
+}
