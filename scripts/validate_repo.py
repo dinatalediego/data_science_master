@@ -25,6 +25,7 @@ REQUIRED_FILES = [
     'supabase/migrations/0011_intervention_effectiveness_memory.sql',
     'supabase/migrations/0012_precycle_readiness.sql',
     'docs/PRECYCLE_READINESS.md',
+    'docs/ACADEMIC_WEEK_INTELLIGENCE.md',
     'components/PreCycleLaunchpad.tsx',
     'docs/REINFORCEMENT_ENGINE.md',
     'docs/INTERVENTION_EFFECTIVENESS_MEMORY.md',
@@ -262,5 +263,24 @@ for contract in [
     if contract.lower() not in precycle_ui.lower():
         fail(f'Pre-cycle readiness UI contract missing: {contract}')
 
+academic_term_ts = (ROOT / 'lib/academicTerm.ts').read_text(encoding='utf-8')
+for contract in [
+    'academicWeekSessionDate',
+    'ACADEMIC_TERM.week_count',
+    'endOfAcademicTerm',
+]:
+    if contract not in academic_term_ts:
+        fail(f'Academic-week runtime contract missing: {contract}')
+
+app_ui = (ROOT / 'components/SocratesApp.tsx').read_text(encoding='utf-8')
+for contract in [
+    'DATED AGENDA',
+    'aria-pressed',
+    'academicWeekSessionDate',
+    'selectedAcademicWeek',
+]:
+    if contract not in app_ui:
+        fail(f'Academic-week UI contract missing: {contract}')
+
 print('SÓCRATES DS repository validation passed.')
-print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, evaluator, weekly review, personal memory and V1.5 pre-cycle readiness contracts.')
+print(f'Validated {len(courses)} canonical courses, academic term, grounding safeguards, reinforcement, evaluator, weekly review, personal memory, pre-cycle and V1.6 dated-week contracts.')
