@@ -16,6 +16,8 @@ type Props = {
   focusCourseId?: string | null;
   focusActionType?: LearningActionType | null;
   focusActionEntityId?: string | null;
+  professorMissionId?: string | null;
+  initialMode?: SessionMode | null;
 };
 
 const MODES: { value: SessionMode; label: string; contract: string }[] = [
@@ -23,6 +25,11 @@ const MODES: { value: SessionMode; label: string; contract: string }[] = [
     value: "socratic",
     label: "Socrático",
     contract: "Primero razonas tú. El sistema revela la guía después de tu intento.",
+  },
+  {
+    value: "professor",
+    label: "Professor",
+    contract: "Meta-Professor fija el objetivo y limita la ayuda; tú produces la evidencia antes del contraste.",
   },
   {
     value: "feynman",
@@ -50,9 +57,11 @@ export default function TutorPanel({
   focusCourseId = null,
   focusActionType = null,
   focusActionEntityId = null,
+  professorMissionId = null,
+  initialMode = null,
 }: Props) {
   const [courseId, setCourseId] = useState(courses[0]?.id || "");
-  const [mode, setMode] = useState<SessionMode>("socratic");
+  const [mode, setMode] = useState<SessionMode>(initialMode || "socratic");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [response, setResponse] = useState("");
@@ -65,6 +74,14 @@ export default function TutorPanel({
   const [evaluation, setEvaluation] = useState<TutorEvaluationResponse | null>(null);
   const [evaluationBusy, setEvaluationBusy] = useState(false);
   const [evaluationStatus, setEvaluationStatus] = useState("");
+  const [professorMission, setProfessorMission] = useState<{
+    assistance_ceiling: number;
+    mission_type: string;
+    objective: string;
+  } | null>(null);
+  const [hintLevel, setHintLevel] = useState(0);
+  const [hintText, setHintText] = useState("");
+  const [hintBusy, setHintBusy] = useState(false);
 
   const current = questions[questionIndex] || null;
   const selectedCourse = useMemo(
@@ -77,6 +94,40 @@ export default function TutorPanel({
       setCourseId(focusCourseId);
     }
   }, [focusCourseId, courseId]);
+
+  useEffect(() => {
+    if (initialMode && initialMode !== mode) {
+      setMode(initialMode);
+    }
+  }, [initialMode, mode]);
+
+  useEffect(() => {
+    setHintLevel(0);
+    setHintText("");
+
+    if (!professorMissionId) {
+      setProfessorMission(null);
+      return;
+    }
+
+    void supabase
+      .from("sds_professor_missions")
+      .select("assistance_ceiling,mission_type,objective")
+      .eq("id", professorMissionId)
+      .eq("user_id", userId)
+      .maybeSingle()
+      .then(({ data }) =>
+        setProfessorMission(
+          data
+            ? {
+                assistance_ceiling: Number(data.assistance_ceiling || 0),
+                mission_type: String(data.mission_type || "diagnostic"),
+                objective: String(data.objective || ""),
+              }
+            : null
+        )
+      );
+  }, [professorMissionId, userId]);
 
   useEffect(() => {
     if (!focusConceptId) {
@@ -105,6 +156,8 @@ export default function TutorPanel({
     setEvaluation(null);
     setEvaluationStatus("");
     setEvaluationBusy(false);
+    setHintLevel(0);
+    setHintText("");
 
     let query = supabase
       .from("sds_question_bank")
@@ -164,6 +217,61 @@ export default function TutorPanel({
     setEvaluation(null);
     setEvaluationStatus("");
     setEvaluationBusy(false);
+    setHintLevel(0);
+    setHintText("");
+  }
+
+  async function requestProfessorHint() {
+    if (!current || !professorMissionId || !professorMission) return;
+
+    const nextLevel = hintLevel + 1;
+    if (nextLevel > professorMission.assistance_ceiling) {
+      setStatus("Esta misión no permite más ayuda antes de producir evidencia.");
+      return;
+    }
+
+    setHintBusy(true);
+    setStatus("");
+
+    try {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token;
+      if (!token) {
+        setStatus("La sesión expiró. Vuelve a iniciar sesión para pedir una pista.");
+        return;
+      }
+
+      const hintResponse = await fetch("/api/professor-hint", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          missionId: professorMissionId,
+          questionId: current.id,
+          level: nextLevel,
+          draft: response,
+        }),
+      });
+
+      const payload = await hintResponse.json();
+      if (!hintResponse.ok) {
+        if (payload?.error === "assistance_ceiling_reached") {
+          setStatus("Meta-Professor bloqueó más ayuda para preservar el cold attempt.");
+        } else {
+          setStatus("La pista no estuvo disponible en esta ejecución.");
+        }
+        return;
+      }
+
+      setHintLevel(Number(payload.level || nextLevel));
+      setHintText(String(payload.hint || ""));
+    } catch {
+      setStatus("La pista no estuvo disponible en esta ejecución.");
+    } finally {
+      setHintBusy(false);
+    }
   }
 
   async function evaluateAttempt(attemptId: string) {
@@ -352,6 +460,84 @@ export default function TutorPanel({
 
       if (eventError) throw eventError;
 
+      if (professorMissionId) {
+        const completedAt = new Date().toISOString();
+
+        const { error: missionError } = await supabase
+          .from("sds_professor_missions")
+          .update({
+            status: "completed",
+            completed_at: completedAt,
+            outcome: {
+              attempt_id: attempt.id,
+              question_id: current.id,
+              self_score: normalizedScore,
+              confidence: normalizedConfidence,
+              dimension: current.dimension,
+              mode,
+              hint_level_used: hintLevel,
+            },
+          })
+          .eq("id", professorMissionId)
+          .eq("user_id", userId);
+
+        if (missionError) throw missionError;
+
+        const { error: coldAttemptError } = await supabase
+          .from("sds_professor_assistance_events")
+          .insert({
+            user_id: userId,
+            mission_id: professorMissionId,
+            level: 0,
+            event_type: "cold_attempt",
+            metadata: {
+              attempt_id: attempt.id,
+              question_id: current.id,
+              self_score: normalizedScore,
+              confidence: normalizedConfidence,
+            },
+          });
+
+        if (coldAttemptError) throw coldAttemptError;
+
+        const { error: professorStateError } = await supabase
+          .from("sds_professor_states")
+          .upsert(
+            {
+              user_id: userId,
+              track_id: (
+                await supabase
+                  .from("sds_professor_missions")
+                  .select("track_id")
+                  .eq("id", professorMissionId)
+                  .eq("user_id", userId)
+                  .single()
+              ).data?.track_id,
+              current_concept_id: current.concept_id,
+              last_evidence_at: completedAt,
+            },
+            { onConflict: "user_id,track_id" }
+          );
+
+        if (professorStateError) throw professorStateError;
+
+        const { error: professorEventError } = await supabase
+          .from("sds_learning_events")
+          .insert({
+            user_id: userId,
+            course_id: current.course_id,
+            concept_id: current.concept_id,
+            event_type: "meta_professor_mission_completed",
+            payload: {
+              mission_id: professorMissionId,
+              attempt_id: attempt.id,
+              hint_level_used: hintLevel,
+            },
+          });
+
+        if (professorEventError) throw professorEventError;
+      }
+
       if (focusActionType) {
         const { error: actionError } = await supabase.rpc(
           "sds_log_learning_action_event",
@@ -418,14 +604,22 @@ export default function TutorPanel({
       {focusConceptId ? (
         <article className="targeted-intervention card">
           <div>
-            <p className="eyebrow dark">TARGETED INTERVENTION</p>
+            <p className="eyebrow dark">
+              {professorMissionId ? "META-PROFESSOR MISSION" : "TARGETED INTERVENTION"}
+            </p>
             <h3>{focusConceptTitle || "Concepto objetivo"}</h3>
             <p>
-              SÓCRATES llegó aquí desde una recomendación priorizada. Busca evidencia
-              específica para este concepto antes de devolverte a contenido nuevo.
+              {professorMissionId
+                ? professorMission?.objective ||
+                  "Produce evidencia propia antes de desbloquear ayuda o la referencia."
+                : "SÓCRATES llegó aquí desde una recomendación priorizada. Busca evidencia específica para este concepto antes de devolverte a contenido nuevo."}
             </p>
           </div>
-          <span>{focusActionType?.replaceAll("_", " ") || "focused practice"}</span>
+          <span>
+            {professorMissionId
+              ? professorMission?.mission_type?.replaceAll("_", " ") || "mission"
+              : focusActionType?.replaceAll("_", " ") || "focused practice"}
+          </span>
         </article>
       ) : null}
 
@@ -485,6 +679,36 @@ export default function TutorPanel({
                 disabled={submitted}
               />
             </label>
+
+            {professorMissionId && !submitted ? (
+              <div className="professor-hint-panel">
+                <div>
+                  <strong>Assistance ladder</strong>
+                  <span>
+                    Nivel {hintLevel}/{professorMission?.assistance_ceiling ?? 0}
+                  </span>
+                </div>
+                {hintText ? <p>{hintText}</p> : null}
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={
+                    hintBusy ||
+                    !professorMission ||
+                    hintLevel >= professorMission.assistance_ceiling
+                  }
+                  onClick={() => void requestProfessorHint()}
+                >
+                  {hintBusy
+                    ? "Preparando pista…"
+                    : !professorMission || professorMission.assistance_ceiling === 0
+                      ? "Misión sin pistas"
+                      : hintLevel === 0
+                        ? "Pedir pregunta socrática"
+                        : "Subir un nivel de ayuda"}
+                </button>
+              </div>
+            ) : null}
 
             {!submitted ? (
               <div className="rating-grid">
