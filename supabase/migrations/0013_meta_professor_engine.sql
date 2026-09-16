@@ -118,6 +118,29 @@ create index if not exists sds_idx_professor_assistance_mission
 create index if not exists sds_idx_professor_states_user
   on public.sds_professor_states(user_id, updated_at desc);
 
+create index if not exists sds_idx_track_concepts_concept
+  on public.sds_track_concepts(concept_id);
+create index if not exists sds_idx_track_concepts_course
+  on public.sds_track_concepts(preferred_course_id)
+  where preferred_course_id is not null;
+create index if not exists sds_idx_professor_states_track
+  on public.sds_professor_states(track_id);
+create index if not exists sds_idx_professor_states_concept
+  on public.sds_professor_states(current_concept_id)
+  where current_concept_id is not null;
+create index if not exists sds_idx_professor_missions_track
+  on public.sds_professor_missions(track_id);
+create index if not exists sds_idx_professor_missions_concept
+  on public.sds_professor_missions(concept_id);
+create index if not exists sds_idx_professor_missions_course
+  on public.sds_professor_missions(course_id)
+  where course_id is not null;
+create index if not exists sds_idx_professor_missions_question
+  on public.sds_professor_missions(question_id)
+  where question_id is not null;
+create index if not exists sds_idx_professor_assistance_user
+  on public.sds_professor_assistance_events(user_id, occurred_at desc);
+
 drop trigger if exists sds_learning_tracks_updated_at on public.sds_learning_tracks;
 create trigger sds_learning_tracks_updated_at
 before update on public.sds_learning_tracks
