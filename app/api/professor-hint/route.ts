@@ -5,9 +5,6 @@ import { NextRequest } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const FALLBACK_SUPABASE_URL = "https://tlyczyfsboqrtrdpwizp.supabase.co";
-const FALLBACK_SUPABASE_KEY = "sb_publishable_gMTGwNPjdwgNuzzRPpUPyA_ezrPfCrT";
-
 function json(body: unknown, status = 200) {
   return Response.json(body, {
     status,
@@ -48,16 +45,29 @@ export async function POST(request: NextRequest) {
   const questionId =
     typeof body.questionId === "string" ? body.questionId.trim() : "";
   const level = Number(body.level);
-  const draft = typeof body.draft === "string" ? body.draft.trim().slice(0, 5000) : "";
+  const draft =
+    typeof body.draft === "string" ? body.draft.trim().slice(0, 5000) : "";
 
   if (!missionId || !questionId || !Number.isInteger(level) || level < 1 || level > 5) {
     return json({ error: "invalid_hint_request" }, 422);
   }
 
-  const supabaseUrl =
-    process.env.NEXT_PUBLIC_SUPABASE_URL || FALLBACK_SUPABASE_URL;
-  const supabaseKey =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_KEY;
+  if (draft.length < 20) {
+    return json(
+      {
+        error: "attempt_required_before_hint",
+        minimumDraftCharacters: 20,
+      },
+      409
+    );
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !supabaseKey) {
+    return json({ error: "supabase_not_configured" }, 503);
+  }
 
   const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
@@ -107,13 +117,25 @@ export async function POST(request: NextRequest) {
     .eq("mission_id", missionId)
     .eq("user_id", userData.user.id)
     .gt("level", 0)
+    .in("event_type", [
+      "hint_shown",
+      "structure_shown",
+      "partial_solution",
+      "reference_solution",
+    ])
     .order("level", { ascending: false })
     .limit(1)
     .maybeSingle();
 
   const lastLevel = Number(lastAssistance?.level || 0);
   if (level > lastLevel + 1) {
-    return json({ error: "assistance_levels_must_be_sequential", nextLevel: lastLevel + 1 }, 409);
+    return json(
+      {
+        error: "assistance_levels_must_be_sequential",
+        nextLevel: lastLevel + 1,
+      },
+      409
+    );
   }
 
   const { data: question, error: questionError } = await supabase
@@ -134,7 +156,7 @@ export async function POST(request: NextRequest) {
     metadata: {
       question_id: questionId,
       mission_type: mission.mission_type,
-      draft_present: Boolean(draft),
+      draft_chars: draft.length,
     },
   });
 
@@ -165,7 +187,7 @@ export async function POST(request: NextRequest) {
     answerGuide,
     "",
     "LEARNER DRAFT:",
-    draft || "(no draft yet)",
+    draft,
     "",
     `REQUESTED HELP LEVEL: ${level}/5`,
     "Return only the hint text. No markdown heading and no answer-key language.",
@@ -190,13 +212,22 @@ export async function POST(request: NextRequest) {
     const hint = result.text.trim().slice(0, 1800);
     if (!hint) throw new Error("empty_hint");
 
+    const eventType =
+      level === 5
+        ? "reference_solution"
+        : level >= 4
+          ? "partial_solution"
+          : level >= 3
+            ? "structure_shown"
+            : "hint_shown";
+
     const { error: logError } = await supabase
       .from("sds_professor_assistance_events")
       .insert({
         user_id: userData.user.id,
         mission_id: missionId,
         level,
-        event_type: level >= 4 ? "partial_solution" : level >= 3 ? "structure_shown" : "hint_shown",
+        event_type: eventType,
         metadata: {
           question_id: questionId,
           provider: "vercel-ai-gateway",
