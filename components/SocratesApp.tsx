@@ -115,6 +115,7 @@ export default function SocratesApp() {
   const [focusTutorActionEntityId, setFocusTutorActionEntityId] = useState<string | null>(null);
   const [focusProfessorMissionId, setFocusProfessorMissionId] = useState<string | null>(null);
   const [focusTutorInitialMode, setFocusTutorInitialMode] = useState<SessionMode | null>(null);
+  const [focusTutorQuestionId, setFocusTutorQuestionId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [selectedAcademicWeek, setSelectedAcademicWeek] = useState(
     () => academicTermStatus().currentWeek || 1
@@ -305,6 +306,9 @@ export default function SocratesApp() {
 
     if (selected) {
       setNotice("");
+      setFocusProfessorMissionId(null);
+      setFocusTutorInitialMode(null);
+      setFocusTutorQuestionId(null);
 
       await supabase.rpc("sds_log_learning_action_event", {
         p_action_type: selected.action_type,
@@ -373,6 +377,7 @@ export default function SocratesApp() {
     setFocusTutorConceptId(payload.conceptId);
     setFocusTutorCourseId(payload.courseId);
     setFocusTutorInitialMode(payload.mode);
+    setFocusTutorQuestionId(payload.questionId);
     setFocusTutorActionType(null);
     setFocusTutorActionEntityId(null);
     setNotice(
@@ -388,6 +393,7 @@ export default function SocratesApp() {
     setFocusTutorActionEntityId(null);
     setFocusProfessorMissionId(null);
     setFocusTutorInitialMode(null);
+    setFocusTutorQuestionId(null);
     setTab("socrates");
   }
 
@@ -770,6 +776,12 @@ export default function SocratesApp() {
             focusActionEntityId={focusTutorActionEntityId}
             professorMissionId={focusProfessorMissionId}
             initialMode={focusTutorInitialMode}
+            focusQuestionId={focusTutorQuestionId}
+            onProfessorMissionComplete={() => {
+              setFocusProfessorMissionId(null);
+              setFocusTutorInitialMode(null);
+              setFocusTutorQuestionId(null);
+            }}
           />
         ) : null}
 
