@@ -4676,3 +4676,319 @@ button.academic-week {
     flex-direction: column;
   }
 }
+
+
+/* V1.7 — META-PROFESSOR */
+.meta-professor-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 28px;
+  align-items: center;
+  background:
+    radial-gradient(circle at 88% 12%, rgba(49, 183, 233, 0.12), transparent 28%),
+    linear-gradient(145deg, rgba(7, 29, 60, 0.98), rgba(11, 45, 92, 0.96));
+  color: var(--white);
+  border-color: transparent;
+}
+
+.meta-professor-hero h3,
+.professor-mission h3 {
+  margin: 4px 0 10px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(25px, 3vw, 36px);
+  letter-spacing: -0.025em;
+}
+
+.meta-professor-hero p:not(.eyebrow) {
+  max-width: 760px;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.65;
+  font-size: 11px;
+}
+
+.professor-progress {
+  min-width: 170px;
+  display: grid;
+  gap: 5px;
+  text-align: right;
+}
+
+.professor-progress strong {
+  font-size: 38px;
+  letter-spacing: -0.045em;
+}
+
+.professor-progress span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.professor-progress i {
+  width: 170px;
+  height: 7px;
+  margin-top: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.professor-progress i b {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--cyan);
+}
+
+.professor-mission {
+  border: 1px solid rgba(36, 87, 214, 0.2);
+  background:
+    linear-gradient(135deg, rgba(36, 87, 214, 0.05), rgba(49, 183, 233, 0.035)),
+    var(--white);
+}
+
+.professor-mission-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.professor-mission-top p:not(.eyebrow) {
+  max-width: 800px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 11px;
+}
+
+.professor-mission-type {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(36, 87, 214, 0.09);
+  color: var(--blue);
+  font-size: 9px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.professor-mission-grid {
+  display: grid;
+  grid-template-columns: 1.8fr repeat(3, minmax(110px, 0.7fr));
+  gap: 10px;
+  margin: 22px 0 14px;
+}
+
+.professor-mission-grid > div {
+  min-height: 84px;
+  padding: 13px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.professor-mission-grid span,
+.professor-mission-grid strong {
+  display: block;
+}
+
+.professor-mission-grid span {
+  color: var(--muted);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.065em;
+}
+
+.professor-mission-grid strong {
+  margin-top: 7px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.professor-mission-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 18px;
+}
+
+.professor-mission-meta span {
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.professor-help-ladder {
+  display: grid;
+  gap: 0;
+  margin-top: 15px;
+}
+
+.professor-help-ladder > div {
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 0;
+  border-top: 1px solid var(--line);
+}
+
+.professor-help-ladder > div:first-child {
+  border-top: 0;
+}
+
+.professor-help-ladder > div > span {
+  width: 27px;
+  height: 27px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--navy);
+  color: var(--white);
+  font-size: 9px;
+  font-weight: 850;
+}
+
+.professor-help-ladder strong,
+.professor-help-ladder small {
+  display: block;
+}
+
+.professor-help-ladder strong {
+  font-size: 10px;
+}
+
+.professor-help-ladder small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.professor-help-ladder .locked {
+  opacity: 0.42;
+}
+
+.professor-help-ladder .locked > b {
+  color: var(--muted);
+  font-size: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.professor-recent-list {
+  display: grid;
+  gap: 0;
+  margin-top: 10px;
+}
+
+.professor-recent-list > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+}
+
+.professor-recent-list > div:first-child {
+  border-top: 0;
+}
+
+.professor-recent-list strong,
+.professor-recent-list small {
+  display: block;
+}
+
+.professor-recent-list strong {
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.professor-recent-list small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+.professor-status {
+  min-width: 66px;
+  padding: 5px 7px;
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--muted);
+  text-align: center;
+  font-size: 7px;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.professor-status.completed {
+  background: rgba(67, 181, 129, 0.1);
+  color: #297552;
+}
+
+.professor-status.in_progress {
+  background: rgba(36, 87, 214, 0.09);
+  color: var(--blue);
+}
+
+.professor-hint-panel {
+  margin: 15px 0;
+  padding: 14px 15px;
+  border: 1px solid rgba(36, 87, 214, 0.15);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(36, 87, 214, 0.045), rgba(49, 183, 233, 0.025)),
+    var(--white);
+}
+
+.professor-hint-panel > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.professor-hint-panel > div:first-child strong {
+  font-size: 10px;
+}
+
+.professor-hint-panel > div:first-child span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.professor-hint-panel p {
+  margin: 12px 0;
+  padding: 11px 12px;
+  border-left: 3px solid var(--blue);
+  background: var(--paper);
+  color: #46546b;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .meta-professor-hero,
+  .professor-mission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .professor-progress {
+    text-align: left;
+  }
+
+  .professor-mission-top {
+    flex-direction: column;
+  }
+}

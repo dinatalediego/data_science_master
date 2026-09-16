@@ -136,3 +136,30 @@ Exact scheduling remains configurable and should respect real calendar conflicts
 ## Next architecture increment
 
 V0.2 adds the deployable Next.js application, Supabase client/server boundaries, authentication, typed queries and the first Today dashboard.
+
+
+## V1.7 Meta-Professor layer
+
+Meta-Professor sits above Tutor Runtime and Learning Analytics. It is a domain-agnostic teaching-policy layer that selects the next teaching move from explicit curriculum structure plus observed evidence.
+
+~~~text
+                 Meta-Professor
+                      │
+       ┌──────────────┼──────────────┐
+       ↓              ↓              ↓
+ Curriculum graph  Knowledge state  Assistance memory
+       └──────────────┼──────────────┘
+                      ↓
+               Teaching mission
+                      ↓
+                 Tutor Runtime
+                      ↓
+              Evidence backbone
+                      ↺
+~~~
+
+The policy is rules-first and explainable. It prioritizes misconceptions, due retrieval, missing evidence, weak mastery, transfer and retention. Each mission carries an assistance ceiling; help is progressive rather than immediately revealing the reference solution.
+
+Machine Learning is the first complete vertical, but tracks are data-defined so Econometrics, Time Series, Linear Algebra and other disciplines can reuse the same engine.
+
+See `docs/META_PROFESSOR_ENGINE.md`.

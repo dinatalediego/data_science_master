@@ -9,6 +9,7 @@ import ReadingRoomPanel from "@/components/ReadingRoomPanel";
 import ReinforcementPanel from "@/components/ReinforcementPanel";
 import WeeklyReviewPanel from "@/components/WeeklyReviewPanel";
 import PreCycleLaunchpad from "@/components/PreCycleLaunchpad";
+import MetaProfessorPanel from "@/components/MetaProfessorPanel";
 import { supabase } from "@/lib/supabase";
 import {
   ACADEMIC_TERM,
@@ -28,9 +29,10 @@ import type {
   Mastery,
   Misconception,
   ReviewItem,
+  SessionMode,
 } from "@/lib/types";
 
-type Tab = "campus" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "weekly" | "calendar" | "thesis";
+type Tab = "campus" | "professor" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "weekly" | "calendar" | "thesis";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -111,6 +113,9 @@ export default function SocratesApp() {
   const [focusTutorCourseId, setFocusTutorCourseId] = useState<string | null>(null);
   const [focusTutorActionType, setFocusTutorActionType] = useState<LearningActionType | null>(null);
   const [focusTutorActionEntityId, setFocusTutorActionEntityId] = useState<string | null>(null);
+  const [focusProfessorMissionId, setFocusProfessorMissionId] = useState<string | null>(null);
+  const [focusTutorInitialMode, setFocusTutorInitialMode] = useState<SessionMode | null>(null);
+  const [focusTutorQuestionId, setFocusTutorQuestionId] = useState<string | null>(null);
   const [notice, setNotice] = useState("");
   const [selectedAcademicWeek, setSelectedAcademicWeek] = useState(
     () => academicTermStatus().currentWeek || 1
@@ -301,6 +306,9 @@ export default function SocratesApp() {
 
     if (selected) {
       setNotice("");
+      setFocusProfessorMissionId(null);
+      setFocusTutorInitialMode(null);
+      setFocusTutorQuestionId(null);
 
       await supabase.rpc("sds_log_learning_action_event", {
         p_action_type: selected.action_type,
@@ -357,11 +365,35 @@ export default function SocratesApp() {
     setTab("socrates");
   }
 
+  function openMetaProfessorMission(payload: {
+    missionId: string;
+    conceptId: string;
+    courseId: string | null;
+    questionId: string | null;
+    mode: SessionMode;
+    missionType: "diagnostic" | "practice" | "debug" | "transfer" | "retention" | "oral_defense";
+  }) {
+    setFocusProfessorMissionId(payload.missionId);
+    setFocusTutorConceptId(payload.conceptId);
+    setFocusTutorCourseId(payload.courseId);
+    setFocusTutorInitialMode(payload.mode);
+    setFocusTutorQuestionId(payload.questionId);
+    setFocusTutorActionType(null);
+    setFocusTutorActionEntityId(null);
+    setNotice(
+      `Meta-Professor abrió una misión ${payload.missionType.replaceAll("_", " ")}. Primero produce evidencia propia; la ayuda se libera por niveles.`
+    );
+    setTab("socrates");
+  }
+
   function openPrecycleDiagnostic(courseId: string) {
     setFocusTutorCourseId(courseId);
     setFocusTutorConceptId(null);
     setFocusTutorActionType(null);
     setFocusTutorActionEntityId(null);
+    setFocusProfessorMissionId(null);
+    setFocusTutorInitialMode(null);
+    setFocusTutorQuestionId(null);
     setTab("socrates");
   }
 
@@ -416,6 +448,7 @@ export default function SocratesApp() {
           <nav>
             {[
               ["campus", "⌂", "Campus"],
+              ["professor", "△", "Professor"],
               ["courses", "▦", "Cursos"],
               ["library", "⌘", "Biblioteca"],
               ["reading", "☰", "Reading Room"],
@@ -451,6 +484,8 @@ export default function SocratesApp() {
             <h1>
               {tab === "campus"
                 ? "Campus"
+                : tab === "professor"
+                  ? "Meta-Professor"
                 : tab === "courses"
                   ? "Mis cursos"
                   : tab === "library"
@@ -665,6 +700,13 @@ export default function SocratesApp() {
           </section>
         ) : null}
 
+        {tab === "professor" ? (
+          <MetaProfessorPanel
+            userId={session.user.id}
+            onStartMission={openMetaProfessorMission}
+          />
+        ) : null}
+
         {tab === "courses" ? (
           <section className="panel-stack">
             <div className="section-heading">
@@ -732,6 +774,14 @@ export default function SocratesApp() {
             focusCourseId={focusTutorCourseId}
             focusActionType={focusTutorActionType}
             focusActionEntityId={focusTutorActionEntityId}
+            professorMissionId={focusProfessorMissionId}
+            initialMode={focusTutorInitialMode}
+            focusQuestionId={focusTutorQuestionId}
+            onProfessorMissionComplete={() => {
+              setFocusProfessorMissionId(null);
+              setFocusTutorInitialMode(null);
+              setFocusTutorQuestionId(null);
+            }}
           />
         ) : null}
 
