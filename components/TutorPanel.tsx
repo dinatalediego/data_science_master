@@ -18,6 +18,8 @@ type Props = {
   focusActionEntityId?: string | null;
   professorMissionId?: string | null;
   initialMode?: SessionMode | null;
+  focusQuestionId?: string | null;
+  onProfessorMissionComplete?: () => void;
 };
 
 const MODES: { value: SessionMode; label: string; contract: string }[] = [
@@ -59,6 +61,8 @@ export default function TutorPanel({
   focusActionEntityId = null,
   professorMissionId = null,
   initialMode = null,
+  focusQuestionId = null,
+  onProfessorMissionComplete,
 }: Props) {
   const [courseId, setCourseId] = useState(courses[0]?.id || "");
   const [mode, setMode] = useState<SessionMode>(initialMode || "socratic");
@@ -75,6 +79,7 @@ export default function TutorPanel({
   const [evaluationBusy, setEvaluationBusy] = useState(false);
   const [evaluationStatus, setEvaluationStatus] = useState("");
   const [professorMission, setProfessorMission] = useState<{
+    track_id: string;
     assistance_ceiling: number;
     mission_type: string;
     objective: string;
@@ -112,7 +117,7 @@ export default function TutorPanel({
 
     void supabase
       .from("sds_professor_missions")
-      .select("assistance_ceiling,mission_type,objective")
+      .select("track_id,assistance_ceiling,mission_type,objective")
       .eq("id", professorMissionId)
       .eq("user_id", userId)
       .maybeSingle()
@@ -120,6 +125,7 @@ export default function TutorPanel({
         setProfessorMission(
           data
             ? {
+                track_id: String(data.track_id || ""),
                 assistance_ceiling: Number(data.assistance_ceiling || 0),
                 mission_type: String(data.mission_type || "diagnostic"),
                 objective: String(data.objective || ""),
@@ -147,7 +153,7 @@ export default function TutorPanel({
     if (!courseId) return;
     void loadQuestions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courseId, mode, focusConceptId]);
+  }, [courseId, mode, focusConceptId, focusQuestionId]);
 
   async function loadQuestions() {
     setStatus("");
@@ -164,8 +170,13 @@ export default function TutorPanel({
       .select("id, course_id, concept_id, mode, dimension, prompt, answer_guide, difficulty")
       .eq("course_id", courseId)
       .eq("active", true)
-      .eq("mode", mode)
       .order("difficulty");
+
+    if (focusQuestionId) {
+      query = query.eq("id", focusQuestionId);
+    } else {
+      query = query.eq("mode", mode);
+    }
 
     if (focusConceptId) {
       query = query.eq("concept_id", focusConceptId);
@@ -505,14 +516,7 @@ export default function TutorPanel({
           .upsert(
             {
               user_id: userId,
-              track_id: (
-                await supabase
-                  .from("sds_professor_missions")
-                  .select("track_id")
-                  .eq("id", professorMissionId)
-                  .eq("user_id", userId)
-                  .single()
-              ).data?.track_id,
+              track_id: professorMission?.track_id,
               current_concept_id: current.concept_id,
               last_evidence_at: completedAt,
             },
@@ -580,6 +584,9 @@ export default function TutorPanel({
       await onEvidence();
       await evaluateAttempt(attempt.id);
       await onEvidence();
+      if (professorMissionId) {
+        onProfessorMissionComplete?.();
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "No se pudo guardar la evidencia.");
     } finally {
