@@ -270,6 +270,8 @@ export default function TutorPanel({
       if (!hintResponse.ok) {
         if (payload?.error === "assistance_ceiling_reached") {
           setStatus("Meta-Professor bloqueó más ayuda para preservar el cold attempt.");
+        } else if (payload?.error === "attempt_required_before_hint") {
+          setStatus("Escribe primero un intento propio de al menos 20 caracteres. La ayuda se desbloquea después de tu razonamiento inicial.");
         } else {
           setStatus("La pista no estuvo disponible en esta ejecución.");
         }
@@ -511,12 +513,27 @@ export default function TutorPanel({
 
         if (coldAttemptError) throw coldAttemptError;
 
+        let missionTrackId = professorMission?.track_id || "";
+        if (!missionTrackId) {
+          const { data: missionContext, error: missionContextError } = await supabase
+            .from("sds_professor_missions")
+            .select("track_id")
+            .eq("id", professorMissionId)
+            .eq("user_id", userId)
+            .single();
+
+          if (missionContextError || !missionContext?.track_id) {
+            throw missionContextError || new Error("No se pudo recuperar el track de la misión.");
+          }
+          missionTrackId = String(missionContext.track_id);
+        }
+
         const { error: professorStateError } = await supabase
           .from("sds_professor_states")
           .upsert(
             {
               user_id: userId,
-              track_id: professorMission?.track_id,
+              track_id: missionTrackId,
               current_concept_id: current.concept_id,
               last_evidence_at: completedAt,
             },
