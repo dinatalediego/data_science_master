@@ -43,7 +43,7 @@ La app ya contiene la URL y la publishable key de Supabase. Si el entorno de Ver
 
 ## 3. Aplicar y vincular
 
-Ejecuta la migración supabase/migrations/0014_whatsapp_tutor.sql sobre el proyecto de Supabase conectado. Luego publica la versión de Vercel que incluye este cambio.
+Ejecuta, en orden, las migraciones supabase/migrations/0014_whatsapp_tutor.sql y supabase/migrations/0015_whatsapp_private_api_access.sql sobre el proyecto de Supabase conectado. Luego publica la versión de Vercel que incluye este cambio.
 
 En SÓCRATES DS, abre WhatsApp → elige 1, 2 o 3 pasadas diarias → genera el código → abre el chat con el tutor y envía VINCULAR <código>. El código vence en diez minutos. Escribe PAUSAR para detener envíos y CONTINUAR para retomarlos.
 
