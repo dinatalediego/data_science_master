@@ -22,6 +22,23 @@ function masked(phone: string | null) {
 export async function GET(request: NextRequest) {
   const userId = await authenticatedUserId(request);
   if (!userId) return json({ error: "unauthorized" }, 401);
+  const serverReady = Boolean(process.env.SUPABASE_SECRET_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY);
+  if (!serverReady) {
+    return json({
+      connected: false,
+      status: "pending",
+      frequency: 2,
+      phone: null,
+      ready: false,
+      senderPhone: process.env.WHATSAPP_DISPLAY_PHONE || null,
+      templateName: process.env.WHATSAPP_TEMPLATE_NAME || "socrates_pildora_v1",
+      slots: [
+        { count: 1, times: ["13:00"] },
+        { count: 2, times: ["13:00", "17:00"] },
+        { count: 3, times: ["11:00", "13:00", "17:00"] },
+      ],
+    });
+  }
   try {
     const supabase = createWhatsAppClient();
     const { data, error } = await supabase
@@ -35,7 +52,7 @@ export async function GET(request: NextRequest) {
       status: data?.status || "pending",
       frequency: Number(data?.daily_frequency ?? 2),
       phone: masked(data?.phone_e164 || null),
-      ready: hasWhatsAppConfiguration(),
+      ready: hasWhatsAppConfiguration() && serverReady,
       senderPhone: process.env.WHATSAPP_DISPLAY_PHONE || null,
       templateName: process.env.WHATSAPP_TEMPLATE_NAME || "socrates_pildora_v1",
       slots: [
