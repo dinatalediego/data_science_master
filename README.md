@@ -75,6 +75,13 @@ Notebooks, exercises, experiments and reproducible artifacts.
 ### Thesis
 The capstone layer that forces transfer across the other six courses.
 
+
+### WhatsApp Tutor
+
+Scheduled SÓCRATES DS practice by WhatsApp. It varies short applied questions across the seven courses, accepts text replies, evaluates against each question's explicit answer guide, and saves reliable evidence to the existing learning-memory tables. The learner controls one, two or three daily passes and can pause with PAUSAR.
+
+The WhatsApp Cloud API setup, approved template, webhook and server variables are documented in [docs/WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md). Scheduled sends require a Meta Business number and an approved WhatsApp template; secure provider credentials are configured outside the repository.
+
 ## Learning evidence ladder
 
 ~~~text

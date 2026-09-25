@@ -4992,3 +4992,90 @@ button.academic-week {
     flex-direction: column;
   }
 }
+
+.whatsapp-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.whatsapp-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .85rem;
+}
+.whatsapp-card h3,
+.whatsapp-template-card h3,
+.whatsapp-setup-note h3 {
+  margin: 0;
+}
+.whatsapp-card p,
+.whatsapp-template-card p,
+.whatsapp-setup-note p {
+  margin: 0;
+  line-height: 1.65;
+}
+.whatsapp-frequency {
+  display: grid;
+  gap: .45rem;
+  width: 100%;
+  color: var(--ink, #172033);
+  font-weight: 650;
+}
+.whatsapp-frequency select {
+  min-height: 44px;
+  border: 1px solid var(--line, #d9e0ea);
+  border-radius: 10px;
+  background: white;
+  color: var(--ink, #172033);
+  padding: .65rem .8rem;
+  font: inherit;
+}
+.whatsapp-pairing {
+  display: grid;
+  gap: .45rem;
+  width: 100%;
+  border: 1px solid var(--line, #d9e0ea);
+  border-radius: 12px;
+  padding: 1rem;
+  background: #f7fafc;
+}
+.whatsapp-pairing strong {
+  font-size: 1.15rem;
+  letter-spacing: .04em;
+}
+.whatsapp-pairing small,
+.whatsapp-template-card small,
+.whatsapp-setup-note .muted,
+.whatsapp-card .muted {
+  color: var(--muted, #64748b);
+  line-height: 1.5;
+}
+.whatsapp-note {
+  border-left: 3px solid #8ba5ce;
+  padding: .3rem 0 .3rem .75rem;
+  color: var(--muted, #64748b);
+  line-height: 1.5;
+}
+.whatsapp-template-card,
+.whatsapp-setup-note {
+  display: grid;
+  gap: .8rem;
+}
+.whatsapp-panel .error-banner,
+.whatsapp-panel .notice-banner {
+  margin: 0;
+}
+.whatsapp-panel .primary-button,
+.whatsapp-panel .secondary-button {
+  cursor: pointer;
+}
+.whatsapp-panel button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+@media (max-width: 900px) {
+  .whatsapp-grid {
+    grid-template-columns: 1fr;
+  }
+}
