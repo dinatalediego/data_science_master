@@ -28,6 +28,8 @@ export function createWhatsAppClient(): WhatsAppClient {
 
 export function hasWhatsAppConfiguration() {
   return Boolean(
+    process.env.CRON_SECRET &&
+    process.env.WHATSAPP_DISPLAY_PHONE &&
     process.env.WHATSAPP_TOKEN &&
     process.env.WHATSAPP_PHONE_NUMBER_ID &&
     process.env.WHATSAPP_VERIFY_TOKEN &&
