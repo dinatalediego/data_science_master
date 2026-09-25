@@ -10,6 +10,7 @@ import ReinforcementPanel from "@/components/ReinforcementPanel";
 import WeeklyReviewPanel from "@/components/WeeklyReviewPanel";
 import PreCycleLaunchpad from "@/components/PreCycleLaunchpad";
 import MetaProfessorPanel from "@/components/MetaProfessorPanel";
+import WhatsAppTutorPanel from "@/components/WhatsAppTutorPanel";
 import { supabase } from "@/lib/supabase";
 import {
   ACADEMIC_TERM,
@@ -32,7 +33,7 @@ import type {
   SessionMode,
 } from "@/lib/types";
 
-type Tab = "campus" | "professor" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "weekly" | "calendar" | "thesis";
+type Tab = "campus" | "professor" | "courses" | "library" | "reading" | "socrates" | "mastery" | "reinforcement" | "weekly" | "calendar" | "thesis" | "whatsapp";
 
 const DAYS: Record<number, string> = {
   1: "Lunes",
@@ -458,6 +459,7 @@ export default function SocratesApp() {
               ["weekly", "▤", "Weekly Review"],
               ["calendar", "□", "Calendario"],
               ["thesis", "◇", "Tesis"],
+              ["whatsapp", "✉", "WhatsApp"],
             ].map(([value, icon, label]) => (
               <button
                 key={value}
@@ -502,7 +504,9 @@ export default function SocratesApp() {
                           ? "Weekly Learning Review"
                           : tab === "calendar"
                           ? "Calendario académico"
-                        : "Thesis Lab"}
+                        : tab === "thesis"
+                          ? "Thesis Lab"
+                          : "WhatsApp Tutor"}
             </h1>
           </div>
           <div className="status-pill">
@@ -1008,6 +1012,8 @@ export default function SocratesApp() {
             </article>
           </section>
         ) : null}
+
+        {tab === "whatsapp" ? <WhatsAppTutorPanel userId={session.user.id} /> : null}
 
         {tab === "thesis" ? (
           <section className="panel-stack">
